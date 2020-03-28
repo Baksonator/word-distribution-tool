@@ -1,5 +1,7 @@
 package input;
 
+import cruncher.CruncherComponent;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,7 +22,7 @@ public class FileInput extends InputCompontent  {
     private AtomicBoolean paused;
     private BlockingQueue<String> filesToRead;
     private final Object pauseSleepLock;
-    private final Object emptyQueueLock;
+    private boolean working;
 
     public FileInput(String disk, int sleepTime, Object pauseSleepLock) {
         super();
@@ -32,9 +34,8 @@ public class FileInput extends InputCompontent  {
         this.paused = new AtomicBoolean(true);
         this.filesToRead = new LinkedBlockingQueue<>();
         this.pauseSleepLock = pauseSleepLock;
-        this.emptyQueueLock = new Object();
-        this.workAssigner = new WorkAssigner(this.filesToRead, this.cruncherComponents, this.pauseSleepLock, this.paused,
-                this.emptyQueueLock);
+        this.workAssigner = new WorkAssigner(this.filesToRead, this.cruncherComponents);
+        this.working = true;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class FileInput extends InputCompontent  {
         Thread workAssignerThread = new Thread(workAssigner);
         workAssignerThread.start();
 
-        while (true) {
+        while (working) {
             synchronized (pauseSleepLock) {
                 if (paused.get()) {
                     try {
@@ -78,42 +79,42 @@ public class FileInput extends InputCompontent  {
                 }
             }
         }
-//        }
     }
 
     private void readDirectory(File directory, String parentDirectory) throws InterruptedException {
         for (File fileEntry : directory.listFiles()) {
-            // TODO Pitaj Baneta kako mora pauza
-//            if (paused.get()) {
-//
-//            }
+
             if (fileEntry.isDirectory()) {
+
                 readDirectory(fileEntry, parentDirectory);
+
             } else {
+
                 if (lastModifiedFile.containsKey(fileEntry.getAbsolutePath())) {
 
                     if (lastModifiedFile.get(fileEntry.getAbsolutePath()) < fileEntry.lastModified()) {
 
-                        synchronized (emptyQueueLock) {
-                            workAssigner.getFilesToRead().put(fileEntry.getAbsolutePath());
-                            emptyQueueLock.notify();
-                        }
-
+                        workAssigner.getFilesToRead().put(fileEntry.getAbsolutePath());
                         lastModifiedFile.put(fileEntry.getAbsolutePath(), fileEntry.lastModified());
                         parentDirectories.put(fileEntry.getAbsolutePath(), parentDirectory);
                     }
 
                 } else {
 
-                    synchronized (emptyQueueLock) {
-                        workAssigner.getFilesToRead().put(fileEntry.getAbsolutePath());
-                        emptyQueueLock.notify();
-                    }
-
+                    workAssigner.getFilesToRead().put(fileEntry.getAbsolutePath());
                     lastModifiedFile.put(fileEntry.getAbsolutePath(), fileEntry.lastModified());
                     parentDirectories.put(fileEntry.getAbsolutePath(), parentDirectory);
                 }
             }
+        }
+    }
+
+    public void stop() {
+        try {
+            workAssigner.getFilesToRead().put("\\");
+            working = false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -148,4 +149,13 @@ public class FileInput extends InputCompontent  {
     public void setPaused(AtomicBoolean paused) {
         this.paused = paused;
     }
+
+    public void addCruncher(CruncherComponent cruncherComponent) {
+        this.cruncherComponents.add(cruncherComponent);
+    }
+
+    public void deleteCruncher(CruncherComponent cruncherComponent) {
+        this.cruncherComponents.remove(cruncherComponent);
+    }
+
 }

@@ -11,7 +11,7 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\A
+// C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\A     pause
 
 public class App {
 
@@ -44,7 +44,10 @@ public class App {
             String command = sc.nextLine();
 
             if (command.equals("exit")) {
-                // TODO Hendlovanje izlaza iz aplikacije
+                inputCompontent.stop();
+                synchronized (pauseSleepLock) {
+                    pauseSleepLock.notify();
+                }
                 break;
             } else if (command.startsWith("addDir")) {
                 inputCompontent.addDirectory(command.split(" ")[1]);
@@ -53,13 +56,13 @@ public class App {
             } else if (command.equals("start")) {
                 synchronized (pauseSleepLock) {
                     if (inputCompontent.getPaused().compareAndSet(true, false)) {
-                        pauseSleepLock.notifyAll();
+                        pauseSleepLock.notify();
                     }
                 }
             } else if (command.equals("pause")) {
                 synchronized (pauseSleepLock) {
                     if (inputCompontent.getPaused().compareAndSet(false, true)) {
-                        pauseSleepLock.notifyAll();
+                        pauseSleepLock.notify();
                     }
                 }
             }
