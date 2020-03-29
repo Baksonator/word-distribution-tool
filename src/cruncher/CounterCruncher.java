@@ -3,14 +3,8 @@ package cruncher;
 import app.App;
 import input.InputCompontent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class CounterCruncher extends CruncherComponent {
 
@@ -44,14 +38,10 @@ public class CounterCruncher extends CruncherComponent {
                     break;
                 }
 
-                System.out.println(currentFile.fileName + " : " + currentFile.fileContents.length());
-
                 activeFiles.add(currentFile.fileName);
 
-                // TODO Don't work with array, kills memory, have to work with original string
-
-                Future<HashMap<String, Long>> result = App.cruncherThreadPool.submit(new BagOfWordsCounter(counterLimit,
-                        currentFile.fileContents.split(" "), arity, false, 0, 0));
+                Future<Map<String, Long>> result = App.cruncherThreadPool.submit(new BagOfWordsCounter(counterLimit,
+                        currentFile.fileContents, arity, false, 0, currentFile.fileContents.length()));
 
                 Thread t = new Thread(new HelperWorker(result));
                 t.start();

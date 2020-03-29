@@ -44,7 +44,7 @@ public class App {
 
         FileInput inputComponent2 = new FileInput("disk2", Integer.parseInt(prop.getProperty("file_input_sleep_time")), pauseSleepLock2);
 
-        CounterCruncher counterCruncher = new CounterCruncher(1, Integer.parseInt(prop.getProperty("counter_data_limit")));
+        CounterCruncher counterCruncher = new CounterCruncher(2, Integer.parseInt(prop.getProperty("counter_data_limit")));
 
         Thread inputComponentThread = new Thread(inputCompontent);
 
@@ -57,6 +57,11 @@ public class App {
         inputComponentThread2.start();
 
         counterCruncherThread.start();
+
+        inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\A");
+        inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\B");
+//        inputComponent2.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk2\\C");
+//        inputComponent2.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk2\\D");
 
         while (true) {
             Scanner sc = new Scanner(System.in);
@@ -97,6 +102,8 @@ public class App {
             } else if (command.equals("addCrunch")) {
                 inputCompontent.addCruncher(counterCruncher);
                 counterCruncher.getInputCompontents().add(inputCompontent);
+                inputComponent2.addCruncher(counterCruncher);
+                counterCruncher.getInputCompontents().add(inputComponent2);
             } else if (command.equals("removeCrunch")) {
 
             } else if (command.startsWith("addDir2")) {

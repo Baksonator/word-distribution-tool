@@ -1,21 +1,19 @@
 package cruncher;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RecursiveTask;
 
-public class BagOfWordsCounter extends RecursiveTask<HashMap<String, Long>> {
+public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
 
     private int counterLimit;
-    private String[] text;
+    private String text;
     private int arity;
     private boolean smallJob;
     private int start;
     private int length;
 
-    public BagOfWordsCounter(int counterLimit, String[] text, int arity, boolean smallJob, int start, int length) {
+    public BagOfWordsCounter(int counterLimit, String text, int arity, boolean smallJob, int start, int length) {
         this.counterLimit = counterLimit;
         this.text = text;
         this.arity = arity;
@@ -25,90 +23,152 @@ public class BagOfWordsCounter extends RecursiveTask<HashMap<String, Long>> {
     }
 
     @Override
-    protected HashMap<String, Long> compute() {
+    protected Map<String, Long> compute() {
         HashMap<String, Long> result = new HashMap<>();
+
+//        return result;
 
         if (smallJob) {
 
             String[] currentWindow = new String[arity];
             String[] copyOfWindow = new String[arity];
+//            int[] wordStarts = new int[arity];
 
             if (length - 1 < arity) {
 
                 return result;
 
             } else {
-                for (int i = 0; i < arity; i++) {
-                    currentWindow[i] = text[start + i].toLowerCase();
-                    copyOfWindow[i] = text[start + i].toLowerCase();
+                int lastIndex = start;
+                int c = 0;
+                int k = start;
+                for (; k < length; k++) {
+                    if (c < arity) {
+                        if (text.charAt(k) == ' ' || text.charAt(k) == '\n') {
+                            currentWindow[c] = text.substring(lastIndex, k);
+                            copyOfWindow[c] = currentWindow[c];
+//                            wordStarts[c] = lastIndex;
+                            c++;
+                            lastIndex = k + 1;
+                        }
+                    } else {
+                        break;
+                    }
                 }
 
                 Arrays.sort(copyOfWindow);
+//
+                StringBuilder sb = new StringBuilder();
 
-                result.put(String.join(" ", copyOfWindow), 1L);
+                for (int i = 0; i < arity - 1; i++) {
+                    sb.append(copyOfWindow[i]);
+                    sb.append(" ");
+                }
+                sb.append(copyOfWindow[arity - 1]);
 
-                for (int i = arity; i <= length; i++) {
-                    for (int j = 0; j < arity - 1; j++) {
-                        currentWindow[i] = currentWindow[i + 1];
-                        copyOfWindow[i] = currentWindow[i];
-                    }
+                String key = sb.toString();
+//                String key = text.substring(wordStarts[0], k);
+//                String key = "bleja";
 
-                    currentWindow[arity - 1] = text[start + i];
-                    copyOfWindow[arity - 1] = currentWindow[arity - 1];
+                result.put(key, 1L);
 
-                    Arrays.sort(copyOfWindow);
+                for (; k < length; k++) {
+                    if (text.charAt(k) == ' ' || text.charAt(k) == '\n') {
+                        for (int i = 0; i < arity - 1; i++) {
+                            currentWindow[i] = currentWindow[i + 1];
+                            copyOfWindow[i] = currentWindow[i];
+//                            wordStarts[i] = wordStarts[i + 1];
+                        }
+                        currentWindow[arity - 1] = text.substring(lastIndex, k);
+                        copyOfWindow[arity - 1] = currentWindow[arity - 1];
+//                        wordStarts[arity - 1] = lastIndex;
 
-                    StringBuilder sb = new StringBuilder();
+                        lastIndex = k + 1;
 
-                    for (int j = 0; j < arity - 1; j++) {
-                        sb.append(copyOfWindow[j]);
-                        sb.append(" ");
-                    }
-                    sb.append(copyOfWindow[arity - 1]);
+                        Arrays.sort(copyOfWindow);
+//
+                        sb = new StringBuilder();
+                        for (int i = 0; i < arity - 1; i++) {
+                            sb.append(copyOfWindow[i]);
+                            sb.append(" ");
+                        }
+                        sb.append(copyOfWindow[arity - 1]);
+//
+                        key = sb.toString();
+//                        key = text.substring(wordStarts[0], k);
+//                        key = "bleja";
 
-                    String key = sb.toString();
-//                    String key = String.join(" ", copyOfWindow);
+                        if (result.containsKey(key)) {
+                            result.put(key, result.get(key) + 1);
+                        } else {
+                            result.put(key, 1L);
+                        }
 
-                    if (result.containsKey(key)) {
-                        result.put(key, result.get(key) + 1);
-                    } else {
-                        result.put(key, 1L);
                     }
                 }
 
             }
-
         } else {
 
             ArrayList<BagOfWordsCounter> counters = new ArrayList<>();
             long currentSize = 0;
 
-            int counter = 0;
             int lastIndex = 0;
-            for (String word : text) {
-                currentSize += word.length();
+            boolean sendWhenCan = false;
+            for (int l = 0; l < text.length(); l++) {
+                if (sendWhenCan && (text.charAt(l) == ' ' || text.charAt(l) == '\n')) {
+                    counters.add(new BagOfWordsCounter(counterLimit, text, arity, true, lastIndex, l));
 
-                if (currentSize >= counterLimit) {
-                    counters.add(new BagOfWordsCounter(counterLimit, text, arity,
-                            true, lastIndex, counter - lastIndex));
+                    lastIndex = l + 1;
                     currentSize = 0;
-                    lastIndex = counter + 1;
-                }
 
-                counter++;
+                    sendWhenCan = false;
+                } else {
+                    if (currentSize >= counterLimit) {
+                        sendWhenCan = true;
+                        if (text.charAt(l) == ' ' || text.charAt(l) == '\n') {
+                            counters.add(new BagOfWordsCounter(counterLimit, text, arity, true, lastIndex, l));
+
+                            lastIndex = l + 1;
+                            currentSize = 0;
+
+                            sendWhenCan = false;
+                        }
+                    }
+                }
+                currentSize++;
             }
+//            counters.add(new BagOfWordsCounter(counterLimit, text, arity, true, lastIndex, text.length()));
+
+//            for (String word : text) {
+//                currentSize += word.length();
+//
+//                if (currentSize >= counterLimit) {
+//                    counters.add(new BagOfWordsCounter(counterLimit, text, arity,
+//                            true, lastIndex, counter - lastIndex));
+//                    currentSize = 0;
+//                    lastIndex = counter + 1;
+//                }
+//
+//                counter++;
+//            }
 
             for (BagOfWordsCounter bagOfWordsCounter : counters) {
                 bagOfWordsCounter.fork();
             }
 
-            List<HashMap<String, Long>> resultList = new ArrayList<>();
+            BagOfWordsCounter thisBagOfWordsCounter = new BagOfWordsCounter(counterLimit, text, arity, true, lastIndex, text.length());
+            Map<String, Long> lastBit = thisBagOfWordsCounter.compute();
+
+            List<Map<String, Long>> resultList = new ArrayList<>();
 
             for (BagOfWordsCounter bagOfWordsCounter : counters) {
                 resultList.add(bagOfWordsCounter.join());
+//                bagOfWordsCounter.join();
             }
+            resultList.add(lastBit);
 
-            for (HashMap<String, Long> singleMap : resultList) {
+            for (Map<String, Long> singleMap : resultList) {
                 for (String key : singleMap.keySet()) {
                     if (result.containsKey(key)) {
                         result.put(key, result.get(key) + singleMap.get(key));
@@ -121,7 +181,7 @@ public class BagOfWordsCounter extends RecursiveTask<HashMap<String, Long>> {
             // TODO Take into account neighbouring strings when joining
 
         }
-
+//
         return result;
     }
 
