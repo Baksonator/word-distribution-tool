@@ -55,6 +55,14 @@ public class CounterCruncher extends CruncherComponent {
 
     }
 
+    public void stop() {
+        try {
+            inputQueue.put(new ReadFile("\\", ""));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public CopyOnWriteArrayList<String> getActiveFiles() {
         return activeFiles;
     }

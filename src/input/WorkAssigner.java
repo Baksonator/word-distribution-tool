@@ -35,6 +35,8 @@ public class WorkAssigner implements Runnable {
 
                 System.out.println(currentlyReading + " : " + readFile.length());
 
+//                System.out.println(readFile.split("").length);
+
                 Iterator<CruncherComponent> cruncherComponentIterator = cruncherComponents.iterator();
                 while (cruncherComponentIterator.hasNext()) {
                     CruncherComponent currComponent = cruncherComponentIterator.next();

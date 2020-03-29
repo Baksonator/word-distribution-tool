@@ -26,13 +26,10 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
     protected Map<String, Long> compute() {
         HashMap<String, Long> result = new HashMap<>();
 
-//        return result;
-
         if (smallJob) {
 
             String[] currentWindow = new String[arity];
             String[] copyOfWindow = new String[arity];
-//            int[] wordStarts = new int[arity];
 
             if (length - 1 < arity) {
 
@@ -47,7 +44,7 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                         if (text.charAt(k) == ' ' || text.charAt(k) == '\n') {
                             currentWindow[c] = text.substring(lastIndex, k);
                             copyOfWindow[c] = currentWindow[c];
-//                            wordStarts[c] = lastIndex;
+
                             c++;
                             lastIndex = k + 1;
                         }
@@ -57,7 +54,7 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                 }
 
                 Arrays.sort(copyOfWindow);
-//
+
                 StringBuilder sb = new StringBuilder();
 
                 for (int i = 0; i < arity - 1; i++) {
@@ -66,9 +63,7 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                 }
                 sb.append(copyOfWindow[arity - 1]);
 
-                String key = sb.toString();
-//                String key = text.substring(wordStarts[0], k);
-//                String key = "bleja";
+                String key = sb.toString().intern();
 
                 result.put(key, 1L);
 
@@ -77,26 +72,22 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                         for (int i = 0; i < arity - 1; i++) {
                             currentWindow[i] = currentWindow[i + 1];
                             copyOfWindow[i] = currentWindow[i];
-//                            wordStarts[i] = wordStarts[i + 1];
                         }
                         currentWindow[arity - 1] = text.substring(lastIndex, k);
                         copyOfWindow[arity - 1] = currentWindow[arity - 1];
-//                        wordStarts[arity - 1] = lastIndex;
 
                         lastIndex = k + 1;
 
                         Arrays.sort(copyOfWindow);
-//
+
                         sb = new StringBuilder();
                         for (int i = 0; i < arity - 1; i++) {
                             sb.append(copyOfWindow[i]);
                             sb.append(" ");
                         }
                         sb.append(copyOfWindow[arity - 1]);
-//
-                        key = sb.toString();
-//                        key = text.substring(wordStarts[0], k);
-//                        key = "bleja";
+
+                        key = sb.toString().intern();
 
                         if (result.containsKey(key)) {
                             result.put(key, result.get(key) + 1);
@@ -138,20 +129,6 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                 }
                 currentSize++;
             }
-//            counters.add(new BagOfWordsCounter(counterLimit, text, arity, true, lastIndex, text.length()));
-
-//            for (String word : text) {
-//                currentSize += word.length();
-//
-//                if (currentSize >= counterLimit) {
-//                    counters.add(new BagOfWordsCounter(counterLimit, text, arity,
-//                            true, lastIndex, counter - lastIndex));
-//                    currentSize = 0;
-//                    lastIndex = counter + 1;
-//                }
-//
-//                counter++;
-//            }
 
             for (BagOfWordsCounter bagOfWordsCounter : counters) {
                 bagOfWordsCounter.fork();
@@ -164,9 +141,10 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
 
             for (BagOfWordsCounter bagOfWordsCounter : counters) {
                 resultList.add(bagOfWordsCounter.join());
-//                bagOfWordsCounter.join();
             }
             resultList.add(lastBit);
+
+            System.out.println("Stigao");
 
             for (Map<String, Long> singleMap : resultList) {
                 for (String key : singleMap.keySet()) {
@@ -181,7 +159,7 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
             // TODO Take into account neighbouring strings when joining
 
         }
-//
+
         return result;
     }
 

@@ -44,7 +44,7 @@ public class App {
 
         FileInput inputComponent2 = new FileInput("disk2", Integer.parseInt(prop.getProperty("file_input_sleep_time")), pauseSleepLock2);
 
-        CounterCruncher counterCruncher = new CounterCruncher(2, Integer.parseInt(prop.getProperty("counter_data_limit")));
+        CounterCruncher counterCruncher = new CounterCruncher(1, Integer.parseInt(prop.getProperty("counter_data_limit")));
 
         Thread inputComponentThread = new Thread(inputCompontent);
 
@@ -58,7 +58,7 @@ public class App {
 
         counterCruncherThread.start();
 
-        inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\A");
+//        inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\A");
         inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\B");
 //        inputComponent2.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk2\\C");
 //        inputComponent2.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk2\\D");
@@ -69,9 +69,14 @@ public class App {
 
             if (command.equals("exit")) {
                 inputCompontent.stop();
+                inputComponent2.stop();
                 synchronized (pauseSleepLock) {
                     pauseSleepLock.notify();
                 }
+                synchronized (pauseSleepLock2) {
+                    pauseSleepLock2.notify();
+                }
+                counterCruncher.stop();
                 break;
             } else if (command.startsWith("addDir1")) {
                 inputCompontent.addDirectory(command.split(" ")[1]);
@@ -105,13 +110,15 @@ public class App {
                 inputComponent2.addCruncher(counterCruncher);
                 counterCruncher.getInputCompontents().add(inputComponent2);
             } else if (command.equals("removeCrunch")) {
-
+                inputCompontent.deleteCruncher(counterCruncher);
+                inputComponent2.deleteCruncher(counterCruncher);
             } else if (command.startsWith("addDir2")) {
                 inputComponent2.addDirectory(command.split(" ")[1]);
             }
         }
 
         inputThreadPool.shutdown();
+        cruncherThreadPool.shutdown();
     }
 
 }
