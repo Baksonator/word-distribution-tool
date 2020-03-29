@@ -150,12 +150,4 @@ public class FileInput extends InputCompontent  {
         this.paused = paused;
     }
 
-    public void addCruncher(CruncherComponent cruncherComponent) {
-        this.cruncherComponents.add(cruncherComponent);
-    }
-
-    public void deleteCruncher(CruncherComponent cruncherComponent) {
-        this.cruncherComponents.remove(cruncherComponent);
-    }
-
 }

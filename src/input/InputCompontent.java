@@ -12,4 +12,19 @@ public abstract class InputCompontent implements Runnable {
         this.cruncherComponents = new CopyOnWriteArrayList<>();
     }
 
+    public CopyOnWriteArrayList<CruncherComponent> getCruncherComponents() {
+        return cruncherComponents;
+    }
+
+    public void setCruncherComponents(CopyOnWriteArrayList<CruncherComponent> cruncherComponents) {
+        this.cruncherComponents = cruncherComponents;
+    }
+
+    public void addCruncher(CruncherComponent cruncherComponent) {
+        this.cruncherComponents.add(cruncherComponent);
+    }
+
+    public void deleteCruncher(CruncherComponent cruncherComponent) {
+        this.cruncherComponents.remove(cruncherComponent);
+    }
 }
