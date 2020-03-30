@@ -17,6 +17,9 @@ public class HelperWorker implements Runnable {
     public void run() {
         try {
             Map<String, Long> realRes = result.get();
+//            for (String key : realRes.keySet()) {
+//                System.out.println(key + " : " + realRes.get(key));
+//            }
             System.out.println(realRes.keySet().size());
         } catch (InterruptedException e) {
             e.printStackTrace();

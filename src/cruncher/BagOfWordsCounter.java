@@ -31,7 +31,7 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
             String[] currentWindow = new String[arity];
             String[] copyOfWindow = new String[arity];
 
-            if (length - 1 < arity) {
+            if (length - start - 1 < arity) {
 
                 return result;
 
@@ -51,6 +51,29 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                     } else {
                         break;
                     }
+
+                }
+
+                if (k == length) {
+                    currentWindow[arity - 1] = text.substring(lastIndex, k).intern();
+                    copyOfWindow[arity - 1] = currentWindow[arity - 1].intern();
+
+                    Arrays.sort(copyOfWindow);
+
+                    StringBuilder sb = new StringBuilder();
+
+                    sb = new StringBuilder();
+                    for (int i = 0; i < arity - 1; i++) {
+                        sb.append(copyOfWindow[i]);
+                        sb.append(" ");
+                    }
+                    sb.append(copyOfWindow[arity - 1]);
+
+                    String key = sb.toString().intern();
+
+                    result.put(key, 1L);
+
+                    return result;
                 }
 
                 Arrays.sort(copyOfWindow);
@@ -98,6 +121,35 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                     }
                 }
 
+                if (k == length) {
+
+                    for (int i = 0; i < arity - 1; i++) {
+                        currentWindow[i] = currentWindow[i + 1];
+                        copyOfWindow[i] = currentWindow[i];
+                    }
+                    currentWindow[arity - 1] = text.substring(lastIndex, k).intern();
+                    copyOfWindow[arity - 1] = currentWindow[arity - 1].intern();
+
+
+                    Arrays.sort(copyOfWindow);
+
+                    sb = new StringBuilder();
+                    for (int i = 0; i < arity - 1; i++) {
+                        sb.append(copyOfWindow[i]);
+                        sb.append(" ");
+                    }
+                    sb.append(copyOfWindow[arity - 1]);
+
+                    key = sb.toString().intern();
+
+                    if (result.containsKey(key)) {
+                        result.put(key, result.get(key) + 1);
+                    } else {
+                        result.put(key, 1L);
+                    }
+
+                }
+
             }
         } else {
 
@@ -117,7 +169,7 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                     String[] copyOfWindow = new String[arity];
                     int c = arity - 2;
                     int k = l - 1;
-                    int lastIndexChar = k;
+                    int lastIndexChar = l;
                     while (c >= 0) {
                         if (text.charAt(k) == ' ' || text.charAt(k) == '\n') {
                             currentWindow[c] = text.substring(k + 1, lastIndexChar).intern();
@@ -128,13 +180,14 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                         }
                         k--;
                     }
+
                     k = l + 1;
-                    lastIndexChar = k;
+                    lastIndexChar =  l + 1;
                     c = arity - 2;
-                    while (c >= 0) {
+                    while (c >= 0 && k < text.length()) {
                         if (text.charAt(k) == ' ' || text.charAt(k) == '\n') {
                             currentWindow[arity - 1] = text.substring(lastIndexChar, k).intern();
-                            copyOfWindow[arity - 1] = currentWindow[c].intern();
+                            copyOfWindow[arity - 1] = currentWindow[arity - 1].intern();
 
                             lastIndexChar = k + 1;
                             c--;

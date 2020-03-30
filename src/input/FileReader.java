@@ -2,6 +2,7 @@ package input;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 public class FileReader implements Callable<String> {
@@ -20,7 +21,7 @@ public class FileReader implements Callable<String> {
         fis.read(data);
         fis.close();
 
-        String readFile = new String(data, "UTF-8");
+        String readFile = new String(data, StandardCharsets.US_ASCII);
         return readFile;
     }
 
