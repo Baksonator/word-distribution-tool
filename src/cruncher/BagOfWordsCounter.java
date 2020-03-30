@@ -73,8 +73,8 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                             currentWindow[i] = currentWindow[i + 1];
                             copyOfWindow[i] = currentWindow[i];
                         }
-                        currentWindow[arity - 1] = text.substring(lastIndex, k);
-                        copyOfWindow[arity - 1] = currentWindow[arity - 1];
+                        currentWindow[arity - 1] = text.substring(lastIndex, k).intern();
+                        copyOfWindow[arity - 1] = currentWindow[arity - 1].intern();
 
                         lastIndex = k + 1;
 
@@ -104,11 +104,67 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
             ArrayList<BagOfWordsCounter> counters = new ArrayList<>();
             long currentSize = 0;
 
+            Map<String, Long> cornerBags = new HashMap<>();
+            StringBuilder sb = new StringBuilder();
+
             int lastIndex = 0;
             boolean sendWhenCan = false;
             for (int l = 0; l < text.length(); l++) {
                 if (sendWhenCan && (text.charAt(l) == ' ' || text.charAt(l) == '\n')) {
                     counters.add(new BagOfWordsCounter(counterLimit, text, arity, true, lastIndex, l));
+
+                    String[] currentWindow = new String[arity];
+                    String[] copyOfWindow = new String[arity];
+                    int c = arity - 2;
+                    int k = l - 1;
+                    int lastIndexChar = k;
+                    while (c >= 0) {
+                        if (text.charAt(k) == ' ' || text.charAt(k) == '\n') {
+                            currentWindow[c] = text.substring(k + 1, lastIndexChar).intern();
+                            copyOfWindow[c] = currentWindow[c].intern();
+
+                            lastIndexChar = k;
+                            c--;
+                        }
+                        k--;
+                    }
+                    k = l + 1;
+                    lastIndexChar = k;
+                    c = arity - 2;
+                    while (c >= 0) {
+                        if (text.charAt(k) == ' ' || text.charAt(k) == '\n') {
+                            currentWindow[arity - 1] = text.substring(lastIndexChar, k).intern();
+                            copyOfWindow[arity - 1] = currentWindow[c].intern();
+
+                            lastIndexChar = k + 1;
+                            c--;
+
+                            Arrays.sort(copyOfWindow);
+
+                            sb = new StringBuilder();
+                            for (int i = 0; i < arity - 1; i++) {
+                                sb.append(copyOfWindow[i]);
+                                sb.append(" ");
+                            }
+                            sb.append(copyOfWindow[arity - 1]);
+
+                            String key = sb.toString().intern();
+
+                            if (cornerBags.containsKey(key)) {
+                                cornerBags.put(key, cornerBags.get(key) + 1);
+                            } else {
+                                cornerBags.put(key, 1L);
+                            }
+
+                            for (int i = 0; i < arity - 1; i++) {
+                                currentWindow[i] = currentWindow[i + 1].intern();
+                                copyOfWindow[i] = currentWindow[i].intern();
+                            }
+
+                        }
+                        k++;
+                    }
+
 
                     lastIndex = l + 1;
                     currentSize = 0;
@@ -142,22 +198,29 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
             for (BagOfWordsCounter bagOfWordsCounter : counters) {
                 resultList.add(bagOfWordsCounter.join());
             }
-            resultList.add(lastBit);
 
             System.out.println("Stigao");
 
             for (Map<String, Long> singleMap : resultList) {
                 for (String key : singleMap.keySet()) {
-                    if (result.containsKey(key)) {
-                        result.put(key, result.get(key) + singleMap.get(key));
+                    if (lastBit.containsKey(key)) {
+                        lastBit.put(key, lastBit.get(key) + singleMap.get(key));
                     } else {
-                        result.put(key, singleMap.get(key));
+                        lastBit.put(key, singleMap.get(key));
                     }
+                }
+                singleMap = null;
+            }
+
+            for (String key : cornerBags.keySet()) {
+                if (lastBit.containsKey(key)) {
+                    lastBit.put(key, lastBit.get(key) + cornerBags.get(key));
+                } else {
+                    lastBit.put(key, cornerBags.get(key));
                 }
             }
 
-            // TODO Take into account neighbouring strings when joining
-
+            return lastBit;
         }
 
         return result;
