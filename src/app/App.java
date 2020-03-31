@@ -24,7 +24,8 @@ public class App {
     public static void main(String[] args) {
         // TODO Threadpool size read froom number of disks
         inputThreadPool = Executors.newFixedThreadPool(2);
-        cruncherThreadPool = new ForkJoinPool();
+        cruncherThreadPool = ForkJoinPool.commonPool();
+//        cruncherThreadPool = Executors.newCachedThreadPool();
 
         Properties prop = new Properties();
 
@@ -44,9 +45,9 @@ public class App {
 
         FileInput inputComponent2 = new FileInput("disk2", Integer.parseInt(prop.getProperty("file_input_sleep_time")), pauseSleepLock2);
 
-        CounterCruncher counterCruncher = new CounterCruncher(3, Integer.parseInt(prop.getProperty("counter_data_limit")));
+        CounterCruncher counterCruncher = new CounterCruncher(2, Integer.parseInt(prop.getProperty("counter_data_limit")));
 
-//        CounterCruncher counterCruncher2 = new CounterCruncher(1, Integer.parseInt(prop.getProperty("counter_data_limit")));
+        CounterCruncher counterCruncher2 = new CounterCruncher(1, Integer.parseInt(prop.getProperty("counter_data_limit")));
 
         Thread inputComponentThread = new Thread(inputCompontent);
 
@@ -54,7 +55,7 @@ public class App {
 
         Thread counterCruncherThread = new Thread(counterCruncher);
 
-//        Thread counterCruncherThread2 = new Thread(counterCruncher2);
+        Thread counterCruncherThread2 = new Thread(counterCruncher2);
 
         inputComponentThread.start();
 
@@ -62,10 +63,10 @@ public class App {
 
         counterCruncherThread.start();
 
-//        counterCruncherThread2.start();
+        counterCruncherThread2.start();
 
         inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\A");
-//        inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\B");
+        inputCompontent.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk1\\B");
 //        inputComponent2.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk2\\C");
 //        inputComponent2.addDirectory("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\disk2\\D");
 
@@ -83,6 +84,7 @@ public class App {
                     pauseSleepLock2.notify();
                 }
                 counterCruncher.stop();
+                counterCruncher2.stop();
                 break;
             } else if (command.startsWith("addDir1")) {
                 inputCompontent.addDirectory(command.split(" ")[1]);
@@ -113,8 +115,8 @@ public class App {
             } else if (command.equals("addCrunch")) {
                 inputCompontent.addCruncher(counterCruncher);
                 counterCruncher.getInputCompontents().add(inputCompontent);
-//                inputCompontent.addCruncher(counterCruncher2);
-//                counterCruncher2.getInputCompontents().add(inputCompontent);
+                inputCompontent.addCruncher(counterCruncher2);
+                counterCruncher2.getInputCompontents().add(inputCompontent);
                 inputComponent2.addCruncher(counterCruncher);
                 counterCruncher.getInputCompontents().add(inputComponent2);
             } else if (command.equals("removeCrunch")) {

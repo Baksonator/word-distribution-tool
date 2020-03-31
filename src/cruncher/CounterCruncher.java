@@ -46,6 +46,8 @@ public class CounterCruncher extends CruncherComponent {
                 Thread t = new Thread(new HelperWorker(result));
                 t.start();
 
+                currentFile = null;
+
                 // TODO Contact Outputs
             } catch (InterruptedException e) {
                 e.printStackTrace();

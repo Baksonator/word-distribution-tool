@@ -35,13 +35,16 @@ public class WorkAssigner implements Runnable {
 
                 System.out.println(currentlyReading + " : " + readFile.length());
 
-//                System.out.println(readFile.split("").length);
+                ReadFile currFile;
 
                 Iterator<CruncherComponent> cruncherComponentIterator = cruncherComponents.iterator();
                 while (cruncherComponentIterator.hasNext()) {
                     CruncherComponent currComponent = cruncherComponentIterator.next();
-                    currComponent.getInputQueue().put(new ReadFile(currentlyReading, readFile));
+                    currFile = new ReadFile(currentlyReading, readFile);
+                    currComponent.getInputQueue().put(currFile);
+                    currFile = null;
                 }
+                currFile = null;
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
