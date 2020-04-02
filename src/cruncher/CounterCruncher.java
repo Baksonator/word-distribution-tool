@@ -2,6 +2,10 @@ package cruncher;
 
 import app.App;
 import input.InputCompontent;
+import javafx.collections.ObservableList;
+import output.CacheOutput;
+import output.OutputComponent;
+import output.ProcessedFile;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -35,20 +39,46 @@ public class CounterCruncher extends CruncherComponent {
                             currComponent.deleteCruncher(this);
                         }
                     }
+
+                    Iterator<OutputComponent> outputComponentIterator = outputComponents.iterator();
+                    while (outputComponentIterator.hasNext()) {
+                        OutputComponent outputComponent = outputComponentIterator.next();
+                        outputComponent.getCruncherComponents().remove(this);
+                    }
+
                     break;
                 }
 
                 activeFiles.add(currentFile.fileName);
 
+
+                // Ovo je za zvezdicu
+                CopyOnWriteArrayList<ObservableList<String>> resultObservableLists = new CopyOnWriteArrayList<>();
+                for (OutputComponent output : outputComponents) {
+                    ((CacheOutput)output).getResultObservableList().add(currentFile.fileName + "-arity" + arity + "*");
+                    resultObservableLists.add(((CacheOutput)output).getResultObservableList());
+                }
+
+
                 Future<Map<String, Long>> result = App.cruncherThreadPool.submit(new BagOfWordsCounter(counterLimit,
                         currentFile.fileContents, arity, false, 0, currentFile.fileContents.length()));
 
-                Thread t = new Thread(new HelperWorker(result));
+
+                Thread t = new Thread(new WorkDoneNotifier(result, currentFile.fileName + "-arity" + arity + "*"
+                        , activeFiles, resultObservableLists));
                 t.start();
 
-                currentFile = null;
+                // Ovo je bilo zbog cuvanja fajla u memoriji
+//                currentFile = null;
 
-                // TODO Contact Outputs
+                Iterator<OutputComponent> outputComponentIterator = outputComponents.iterator();
+                while (outputComponentIterator.hasNext()) {
+                    OutputComponent outputComponent = outputComponentIterator.next();
+                    ProcessedFile processedFile = new ProcessedFile(currentFile.fileName + "-arity" + arity,
+                            result);
+                    outputComponent.getInputQueue().put(processedFile);
+                }
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -22,7 +22,7 @@ public class FileInput extends InputCompontent  {
     private AtomicBoolean paused;
     private BlockingQueue<String> filesToRead;
     private final Object pauseSleepLock;
-    private boolean working;
+    private volatile boolean working;
 
     public FileInput(String disk, int sleepTime, Object pauseSleepLock) {
         super();

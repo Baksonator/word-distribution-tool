@@ -28,4 +28,8 @@ public abstract class CruncherComponent implements Runnable {
     public CopyOnWriteArrayList<InputCompontent> getInputCompontents() {
         return inputCompontents;
     }
+
+    public CopyOnWriteArrayList<OutputComponent> getOutputComponents() {
+        return outputComponents;
+    }
 }
