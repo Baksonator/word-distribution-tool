@@ -36,6 +36,8 @@ public class CacheOutput extends OutputComponent {
 
                 System.out.println("Tu sam : " + currFile.fileName);
 
+                // Ako vec ima u mapi, vidi da pokrenes novog worker-a da se blokira i stavi ga tamo tek kad je spreman
+
                 results.put(currFile.fileName, currFile.bagCounts);
 
             } catch (InterruptedException e) {

@@ -35,6 +35,7 @@ public class WorkDoneNotifier implements Runnable {
             for (ObservableList<String> resultObservableList : resultObservableLists) {
                 resultObservableList.set(resultObservableList.indexOf(activeFileName), activeFileName);
             }
+            // TODO Pitaj da ako vec postoji tu
 
 
             System.out.println(realRes.keySet().size());

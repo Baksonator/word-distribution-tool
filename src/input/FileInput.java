@@ -1,6 +1,7 @@
 package input;
 
 import cruncher.CruncherComponent;
+import javafx.scene.control.Label;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,8 +24,9 @@ public class FileInput extends InputCompontent  {
     private BlockingQueue<String> filesToRead;
     private final Object pauseSleepLock;
     private volatile boolean working;
+    private Label activeJobLabel;
 
-    public FileInput(String disk, int sleepTime, Object pauseSleepLock) {
+    public FileInput(String disk, int sleepTime) {
         super();
         this.disk = disk;
         this.sleepTime = sleepTime;
@@ -33,7 +35,7 @@ public class FileInput extends InputCompontent  {
         this.parentDirectories = new ConcurrentHashMap<>();
         this.paused = new AtomicBoolean(true);
         this.filesToRead = new LinkedBlockingQueue<>();
-        this.pauseSleepLock = pauseSleepLock;
+        this.pauseSleepLock = new Object();
         this.workAssigner = new WorkAssigner(this.filesToRead, this.cruncherComponents);
         this.working = true;
     }
@@ -150,4 +152,11 @@ public class FileInput extends InputCompontent  {
         this.paused = paused;
     }
 
+    public Object getPauseSleepLock() {
+        return pauseSleepLock;
+    }
+
+    public WorkAssigner getWorkAssigner() {
+        return workAssigner;
+    }
 }

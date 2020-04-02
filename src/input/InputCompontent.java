@@ -20,9 +20,7 @@ public abstract class InputCompontent implements Runnable {
         this.cruncherComponents = cruncherComponents;
     }
 
-    public void addCruncher(CruncherComponent cruncherComponent) {
-        this.cruncherComponents.add(cruncherComponent);
-    }
+    public void addCruncher(CruncherComponent cruncherComponent) { this.cruncherComponents.add(cruncherComponent); }
 
     public void deleteCruncher(CruncherComponent cruncherComponent) {
         this.cruncherComponents.remove(cruncherComponent);
