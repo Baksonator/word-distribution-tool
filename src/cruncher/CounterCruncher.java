@@ -2,6 +2,7 @@ package cruncher;
 
 import app.App;
 import input.InputCompontent;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import output.CacheOutput;
 import output.OutputComponent;
@@ -13,12 +14,12 @@ import java.util.concurrent.*;
 public class CounterCruncher extends CruncherComponent {
 
     private int counterLimit;
-    private CopyOnWriteArrayList<String> activeFiles;
+    private ObservableList<String> activeFiles;
 
-    public CounterCruncher(int arity, int counterLimit) {
+    public CounterCruncher(int arity, int counterLimit, ObservableList<String> activeFiles) {
         super(arity);
         this.counterLimit = counterLimit;
-        this.activeFiles = new CopyOnWriteArrayList<>();
+        this.activeFiles = activeFiles;
     }
 
     @Override
@@ -49,8 +50,15 @@ public class CounterCruncher extends CruncherComponent {
                     break;
                 }
 
-                activeFiles.add(currentFile.fileName);
+                String copyReading = currentFile.fileName.replace("\\", "/");
+//                activeFiles.add(copyReading);
 
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        activeFiles.add(copyReading.split("/")[copyReading.split("/").length - 1]);
+                    }
+                });
 
                 // Ovo je za zvezdicu
                 CopyOnWriteArrayList<ObservableList<String>> resultObservableLists = new CopyOnWriteArrayList<>();
@@ -64,7 +72,7 @@ public class CounterCruncher extends CruncherComponent {
                         currentFile.fileContents, arity, false, 0, currentFile.fileContents.length()));
 
 
-                Thread t = new Thread(new WorkDoneNotifier(result, currentFile.fileName + "-arity" + arity + "*"
+                Thread t = new Thread(new WorkDoneNotifier(result, copyReading.split("/")[copyReading.split("/").length - 1]
                         , activeFiles, resultObservableLists));
                 t.start();
 
@@ -74,7 +82,7 @@ public class CounterCruncher extends CruncherComponent {
                 Iterator<OutputComponent> outputComponentIterator = outputComponents.iterator();
                 while (outputComponentIterator.hasNext()) {
                     OutputComponent outputComponent = outputComponentIterator.next();
-                    ProcessedFile processedFile = new ProcessedFile(currentFile.fileName + "-arity" + arity,
+                    ProcessedFile processedFile = new ProcessedFile(copyReading,
                             result);
                     outputComponent.getInputQueue().put(processedFile);
                 }
@@ -95,7 +103,12 @@ public class CounterCruncher extends CruncherComponent {
         }
     }
 
-    public CopyOnWriteArrayList<String> getActiveFiles() {
+    public ObservableList<String> getActiveFiles() {
         return activeFiles;
+    }
+
+    @Override
+    protected Object call() throws Exception {
+        return null;
     }
 }

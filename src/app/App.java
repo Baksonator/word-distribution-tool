@@ -72,7 +72,7 @@ public class App extends Application {
 
 //        FileInput inputComponent2 = new FileInput("disk2", Integer.parseInt(prop.getProperty("file_input_sleep_time")), pauseSleepLock2);
 
-        CounterCruncher counterCruncher = new CounterCruncher(1, Integer.parseInt(prop.getProperty("counter_data_limit")));
+//        CounterCruncher counterCruncher = new CounterCruncher(1, Integer.parseInt(prop.getProperty("counter_data_limit")));
 
 //        CounterCruncher counterCruncher2 = new CounterCruncher(2, Integer.parseInt(prop.getProperty("counter_data_limit")));
 
@@ -82,7 +82,7 @@ public class App extends Application {
 
 //        Thread inputComponentThread2 = new Thread(inputComponent2);
 
-        Thread counterCruncherThread = new Thread(counterCruncher);
+//        Thread counterCruncherThread = new Thread(counterCruncher);
 
 //        Thread counterCruncherThread2 = new Thread(counterCruncher2);
 
@@ -92,7 +92,7 @@ public class App extends Application {
 
 //        inputComponentThread2.start();
 
-        counterCruncherThread.start();
+//        counterCruncherThread.start();
 
 //        counterCruncherThread2.start();
 
@@ -116,7 +116,7 @@ public class App extends Application {
                 synchronized (pauseSleepLock2) {
                     pauseSleepLock2.notify();
                 }
-                counterCruncher.stop();
+//                counterCruncher.stop();
 //                counterCruncher2.stop();
                 cacheOutput.stop();
                 break;
@@ -159,7 +159,7 @@ public class App extends Application {
             } else if (command.startsWith("addDir2")) {
 //                inputComponent2.addDirectory(command.split(" ")[1]);
             } else if (command.equals("addOutput")) {
-                counterCruncher.getOutputComponents().add(cacheOutput);
+//                counterCruncher.getOutputComponents().add(cacheOutput);
 //                counterCruncher2.getOutputComponents().add(cacheOutput);
             } else if (command.equals("union")) {
                 List<String> resultsToSum = new ArrayList<>();
@@ -204,6 +204,7 @@ public class App extends Application {
         mainPane.getChildren().add(fileInputs);
         mainPane.getChildren().add(new Separator(Orientation.VERTICAL));
         mainPane.getChildren().add(crunchers);
+        mainPane.getChildren().add(new Separator(Orientation.VERTICAL));
 
         mainPane.getChildren().add(output);
 

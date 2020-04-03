@@ -3,8 +3,11 @@ package gui;
 import app.App;
 import cruncher.CounterCruncher;
 import gui.controllers.RemoveCruncherAction;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import output.OutputComponent;
 
@@ -17,9 +20,13 @@ public class SingleCruncherPane extends VBox {
     private CounterCruncher counterCruncher;
     private int arity;
     private String name;
+    private ListView<String> activeListView;
+    private ObservableList<String> activeFiles;
+    private Label crunchingLabel;
 
     public SingleCruncherPane(int arity, CruncherPane cruncherPane, OutputComponent outputComponent) {
-        counterCruncher = new CounterCruncher(arity, Integer.parseInt(App.prop.getProperty("counter_data_limit")));
+        activeFiles = FXCollections.observableArrayList();
+        counterCruncher = new CounterCruncher(arity, Integer.parseInt(App.prop.getProperty("counter_data_limit")), activeFiles);
         counterCruncher.getOutputComponents().add(outputComponent);
         this.arity = arity;
         this.cruncherPane = cruncherPane;
@@ -43,9 +50,16 @@ public class SingleCruncherPane extends VBox {
         removeCruncherButton = new Button("Remove cruncher");
         removeCruncherButton.setOnAction(new RemoveCruncherAction(cruncherPane, this));
 
+        crunchingLabel = new Label("Crunching:");
+
+
+        activeListView = new ListView<>(activeFiles);
+
         getChildren().add(cruncherName);
         getChildren().add(cruncherArity);
         getChildren().add(removeCruncherButton);
+        getChildren().add(crunchingLabel);
+        getChildren().add(activeListView);
     }
 
     public String getName() {
