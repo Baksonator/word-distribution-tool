@@ -70,13 +70,20 @@ public class SingleFileInputPane extends VBox {
 
         HBox linkingHbox = new HBox();
         linkCruncherBtn = new Button("Link cruncher");
-        linkCruncherBtn.setDisable(false);
-        linkCruncherBtn.setOnAction(new LinkCruncher(crunchersComboBox, addedCrunchersList, this));
+        linkCruncherBtn.setDisable(true);
+        linkCruncherBtn.setOnAction(new LinkCruncher(crunchersComboBox, addedCrunchersList, this, linkCruncherBtn));
         unlinkCruncherBtn = new Button("Unlink cruncher");
-        unlinkCruncherBtn.setDisable(false);
-        unlinkCruncherBtn.setOnAction(new UnlinkCruncher(addedCrunchersListView, addedCrunchersList, this));
+        unlinkCruncherBtn.setDisable(true);
+        unlinkCruncherBtn.setOnAction(new UnlinkCruncher(addedCrunchersListView, addedCrunchersList, this,
+                linkCruncherBtn, crunchersComboBox));
         linkingHbox.getChildren().add(linkCruncherBtn);
         linkingHbox.getChildren().add(unlinkCruncherBtn);
+        if (crunchersList.size() > 0) {
+            linkCruncherBtn.setDisable(false);
+        }
+
+        crunchersComboBox.valueProperty().addListener(new CruncherComboBoxChange(linkCruncherBtn, addedCrunchersList));
+        addedCrunchersListView.getSelectionModel().selectedItemProperty().addListener(new CruncherListViewChange(unlinkCruncherBtn));
 
         dirsLabel = new Label("Dirs:");
 
@@ -92,7 +99,7 @@ public class SingleFileInputPane extends VBox {
         dirsHbox.getChildren().add(addDirBtn);
         dirsHbox.getChildren().add(removeDirBtn);
 
-        dirsListView.getSelectionModel().selectedItemProperty().addListener(new DirsListViewChane(removeDirBtn));
+        dirsListView.getSelectionModel().selectedItemProperty().addListener(new DirsListViewChange(removeDirBtn));
 
         HBox lastHbox = new HBox();
         startBtn = new Button("Start");
@@ -135,5 +142,9 @@ public class SingleFileInputPane extends VBox {
 
     public FileInput getFileInputComponent() {
         return fileInputComponent;
+    }
+
+    public ObservableList<String> getAddedCrunchersList() {
+        return addedCrunchersList;
     }
 }

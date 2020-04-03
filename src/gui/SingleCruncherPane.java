@@ -2,6 +2,7 @@ package gui;
 
 import app.App;
 import cruncher.CounterCruncher;
+import gui.controllers.RemoveCruncherAction;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -40,6 +41,7 @@ public class SingleCruncherPane extends VBox {
         cruncherArity = new Label("Arity: " + arity);
 
         removeCruncherButton = new Button("Remove cruncher");
+        removeCruncherButton.setOnAction(new RemoveCruncherAction(cruncherPane, this));
 
         getChildren().add(cruncherName);
         getChildren().add(cruncherArity);

@@ -4,20 +4,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Button;
 
-public class DirsListViewChane implements ChangeListener<String> {
+public class CruncherListViewChange implements ChangeListener<String> {
 
-    private Button removeDirBtn;
+    private Button unlinkCruncherBtn;
 
-    public DirsListViewChane(Button removeDirBtn) {
-        this.removeDirBtn = removeDirBtn;
+    public CruncherListViewChange(Button unlinkCruncherBtn) {
+        this.unlinkCruncherBtn = unlinkCruncherBtn;
     }
 
     @Override
     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         if (newValue != null) {
-            removeDirBtn.setDisable(false);
+            unlinkCruncherBtn.setDisable(false);
         } else {
-            removeDirBtn.setDisable(true);
+            unlinkCruncherBtn.setDisable(true);
         }
     }
 }
