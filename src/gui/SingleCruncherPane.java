@@ -54,6 +54,7 @@ public class SingleCruncherPane extends VBox {
 
 
         activeListView = new ListView<>(activeFiles);
+        activeListView.setMaxWidth(100);
 
         getChildren().add(cruncherName);
         getChildren().add(cruncherArity);

@@ -58,6 +58,7 @@ public class SingleFileInputPane extends VBox {
 
         addedCrunchersList = FXCollections.observableArrayList();
         addedCrunchersListView = new ListView<>(addedCrunchersList);
+        addedCrunchersListView.setMaxWidth(200);
 
         crunchersList = FXCollections.observableArrayList();
         for (SingleCruncherPane singleCruncherPane : fileInputsPane.getApp().crunchers.getSingleCruncherPanes()) {
@@ -89,6 +90,7 @@ public class SingleFileInputPane extends VBox {
 
         dirsList = FXCollections.observableArrayList();
         dirsListView = new ListView<>(dirsList);
+        dirsListView.setMaxWidth(200);
 
         HBox dirsHbox = new HBox();
         addDirBtn = new Button("Add dir");

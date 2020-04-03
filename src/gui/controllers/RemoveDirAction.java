@@ -29,7 +29,8 @@ public class RemoveDirAction implements EventHandler<ActionEvent> {
         String selectedItem = dirsListView.getSelectionModel().getSelectedItem();
 
         dirsList.remove(selectedItem);
-        fileInputComponent.deleteDirectory(App.PATH + disk);
+//        fileInputComponent.deleteDirectory(App.PATH + disk);
+        fileInputComponent.deleteDirectory(selectedItem);
         removeDirBtn.setDisable(true);
     }
 }

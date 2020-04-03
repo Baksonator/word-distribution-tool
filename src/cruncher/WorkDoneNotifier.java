@@ -3,6 +3,7 @@ package cruncher;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import output.CacheOutput;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,13 +19,18 @@ public class WorkDoneNotifier extends Task {
     private ObservableList<String> activeFiles;
     private CopyOnWriteArrayList<ObservableList<String>> resultObservableLists;
     private Object lock = new Object();
+    private CacheOutput cacheOutput;
+    private boolean exists;
 
     public WorkDoneNotifier(Future<Map<String, Long>> result, String activeFileName, ObservableList activeFiles,
-                            CopyOnWriteArrayList<ObservableList<String>> resultObservableList) {
+                            CopyOnWriteArrayList<ObservableList<String>> resultObservableList, CacheOutput cacheOutput,
+                            boolean exists) {
         this.result = result;
         this.activeFileName = activeFileName;
         this.activeFiles = activeFiles;
         this.resultObservableLists = resultObservableList;
+        this.cacheOutput = cacheOutput;
+        this.exists = exists;
     }
 
     @Override
@@ -32,12 +38,16 @@ public class WorkDoneNotifier extends Task {
         try {
             Map<String, Long> realRes = result.get();
 
+            if (exists) {
+                cacheOutput.getResults().put(activeFileName, result);
+            }
+
             // Ovo je za aktivne fajlove i zvezdicu
 //            activeFiles.remove(activeFileName);
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    activeFiles.remove(activeFileName);
+                    activeFiles.remove(activeFileName.split("/")[activeFileName.split("/").length - 1]);
                 }
             });
 

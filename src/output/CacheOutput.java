@@ -4,23 +4,26 @@ import app.App;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CacheOutput extends OutputComponent {
 
     private ObservableList<String> resultObservableList;
     private ConcurrentHashMap<String, Future<Map<String, Long>>> results;
     private int sortProgressLimit;
+    private AtomicBoolean workFinished;
 
     public CacheOutput(int sortProgressLimit) {
         super();
         this.results = new ConcurrentHashMap();
         this.sortProgressLimit = sortProgressLimit;
         this.resultObservableList = FXCollections.observableArrayList(); // TODO Ovo treba da se setuje iz GUI-a
+        this.workFinished = new AtomicBoolean(false);
     }
 
     @Override
@@ -45,6 +48,13 @@ public class CacheOutput extends OutputComponent {
             }
         }
 
+        App.outputThreadPool.shutdown();
+        try {
+            App.outputThreadPool.awaitTermination(100, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        workFinished.set(true);
     }
 
     public void union(String resultName, Unifier unifier) {
@@ -87,4 +97,11 @@ public class CacheOutput extends OutputComponent {
         return resultObservableList;
     }
 
+    public AtomicBoolean getWorkFinished() {
+        return workFinished;
+    }
+
+    public ConcurrentHashMap<String, Future<Map<String, Long>>> getResults() {
+        return results;
+    }
 }

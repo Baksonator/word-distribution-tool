@@ -27,7 +27,11 @@ public class AddDirAction implements EventHandler<ActionEvent> {
         directoryChooser.setInitialDirectory(new File(App.PATH + disk));
         File selectedFolder = directoryChooser.showDialog(App.primaryStage);
 
-        fileInputComponent.addDirectory(selectedFolder.getAbsolutePath());
-        dirsList.add(selectedFolder.getAbsolutePath());
+        if (selectedFolder == null) {
+            return;
+        }
+
+        fileInputComponent.addDirectory(selectedFolder.getAbsolutePath() + "\\");
+        dirsList.add(selectedFolder.getAbsolutePath() + "\\");
     }
 }

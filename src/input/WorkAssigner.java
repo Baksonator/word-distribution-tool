@@ -7,17 +7,20 @@ import javafx.concurrent.Task;
 
 import java.util.Iterator;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WorkAssigner extends Task<String> {
 
     private BlockingQueue<String> filesToRead;
     private CopyOnWriteArrayList<CruncherComponent> cruncherComponents;
     private String currentlyReading;  // Za prikazivanje aktivnosti
+    private AtomicBoolean workFinished;
 
     public WorkAssigner(BlockingQueue filesToRead, CopyOnWriteArrayList cruncherComponents) {
         this.filesToRead = filesToRead;
         this.cruncherComponents = cruncherComponents;
         this.currentlyReading = "Idle";
+        this.workFinished = new AtomicBoolean(false);
     }
 
 
@@ -38,6 +41,11 @@ public class WorkAssigner extends Task<String> {
 
                 Future<String> readFileFuture = App.inputThreadPool.submit(new FileReader(currentlyReading));
                 String readFile = readFileFuture.get();
+
+                if (readFile == null) {
+                    updateMessage("Idle");
+                    break;
+                }
 
                 System.out.println(currentlyReading + " : " + readFile.length());
 
@@ -62,6 +70,13 @@ public class WorkAssigner extends Task<String> {
             }
 
         }
+        App.inputThreadPool.shutdown();
+        try {
+            App.inputThreadPool.awaitTermination(100, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        workFinished.set(true);
     }
 
     public BlockingQueue<String> getFilesToRead() {
@@ -75,5 +90,9 @@ public class WorkAssigner extends Task<String> {
     @Override
     protected String call() throws Exception {
         return null;
+    }
+
+    public AtomicBoolean getWorkFinished() {
+        return workFinished;
     }
 }

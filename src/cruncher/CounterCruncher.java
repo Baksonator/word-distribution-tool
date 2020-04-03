@@ -10,16 +10,21 @@ import output.ProcessedFile;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CounterCruncher extends CruncherComponent {
 
     private int counterLimit;
     private ObservableList<String> activeFiles;
+    private AtomicBoolean workFinished;
+    private ExecutorService myThreadPool;
 
     public CounterCruncher(int arity, int counterLimit, ObservableList<String> activeFiles) {
         super(arity);
         this.counterLimit = counterLimit;
         this.activeFiles = activeFiles;
+        this.workFinished = new AtomicBoolean(false);
+        this.myThreadPool = Executors.newCachedThreadPool();
     }
 
     @Override
@@ -72,19 +77,27 @@ public class CounterCruncher extends CruncherComponent {
                         currentFile.fileContents, arity, false, 0, currentFile.fileContents.length()));
 
 
-                Thread t = new Thread(new WorkDoneNotifier(result, copyReading.split("/")[copyReading.split("/").length - 1]
-                        , activeFiles, resultObservableLists));
-                t.start();
+//                Thread t = new Thread(new WorkDoneNotifier(result, copyReading.split("/")[copyReading.split("/").length - 1]
+//                        , activeFiles, resultObservableLists));
+//                t.start();
 
                 // Ovo je bilo zbog cuvanja fajla u memoriji
 //                currentFile = null;
 
                 Iterator<OutputComponent> outputComponentIterator = outputComponents.iterator();
                 while (outputComponentIterator.hasNext()) {
-                    OutputComponent outputComponent = outputComponentIterator.next();
+                    CacheOutput outputComponent = (CacheOutput)outputComponentIterator.next();
                     ProcessedFile processedFile = new ProcessedFile(copyReading,
                             result);
-                    outputComponent.getInputQueue().put(processedFile);
+
+                    boolean exists = false;
+                    if (!outputComponent.getResults().containsKey(copyReading)) {
+                        outputComponent.getInputQueue().put(processedFile);
+                        exists = true;
+                    }
+
+                    myThreadPool.submit(new WorkDoneNotifier(result, copyReading,
+                            activeFiles, resultObservableLists, outputComponent, exists));
                 }
 
             } catch (InterruptedException e) {
@@ -93,6 +106,14 @@ public class CounterCruncher extends CruncherComponent {
 
         }
 
+        App.cruncherThreadPool.awaitQuiescence(100, TimeUnit.SECONDS);
+        myThreadPool.shutdown();
+        try {
+            myThreadPool.awaitTermination(100, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        workFinished.set(true);
     }
 
     public void stop() {
@@ -110,5 +131,9 @@ public class CounterCruncher extends CruncherComponent {
     @Override
     protected Object call() throws Exception {
         return null;
+    }
+
+    public AtomicBoolean getWorkFinished() {
+        return workFinished;
     }
 }

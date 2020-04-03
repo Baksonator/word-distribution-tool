@@ -1,6 +1,5 @@
 package input;
 
-import cruncher.CruncherComponent;
 import javafx.scene.control.Label;
 
 import java.io.File;
@@ -113,8 +112,8 @@ public class FileInput extends InputCompontent  {
 
     public void stop() {
         try {
-            workAssigner.getFilesToRead().put("\\");
             working = false;
+            workAssigner.getFilesToRead().put("\\");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -125,12 +124,13 @@ public class FileInput extends InputCompontent  {
     }
 
     public void deleteDirectory(String directory) {
+        directory = directory.replace("/", "\\");
         directories.remove(directory);
 
         ArrayList<String> filesToRemove = new ArrayList<>();
         Iterator<String> removeFileIterator = lastModifiedFile.keySet().iterator();
 
-        while (removeFileIterator.hasNext()) {
+        while (removeFileIterator.hasNext()) { ;
 
             String filePath = removeFileIterator.next();
             if (parentDirectories.get(filePath).equals(directory)) {
