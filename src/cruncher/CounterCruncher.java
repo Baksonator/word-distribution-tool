@@ -55,7 +55,8 @@ public class CounterCruncher extends CruncherComponent {
                     break;
                 }
 
-                String copyReading = currentFile.fileName.replace("\\", "/") + "-arity" + arity;
+                String copyReading = currentFile.fileName.replace("\\", "/");
+                String copyReading1 = copyReading + "-arity" + arity;
 //                activeFiles.add(copyReading);
 
                 Platform.runLater(new Runnable() {
@@ -88,24 +89,24 @@ public class CounterCruncher extends CruncherComponent {
                 while (outputComponentIterator.hasNext()) {
                     CacheOutput outputComponent = (CacheOutput)outputComponentIterator.next();
 //                    copyReading += "-arity" + arity;
-                    ProcessedFile processedFile = new ProcessedFile(copyReading,
+                    ProcessedFile processedFile = new ProcessedFile(copyReading1,
                             result);
 
                     boolean exists = false;
-                    if (!outputComponent.getResults().containsKey(copyReading)) {
+                    if (!outputComponent.getResults().containsKey(copyReading1)) {
                         outputComponent.getInputQueue().put(processedFile);
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                outputComponent.getResultObservableList().add(copyReading.split("/")[copyReading.split("/").length - 1] + "*");
+                                outputComponent.getResultObservableList().add(copyReading1.split("/")[copyReading1.split("/").length - 1] + "*");
                             }
                         });
                     } else {
                         exists = true;
                     }
 
-                    myThreadPool.submit(new WorkDoneNotifier(result, copyReading,
-                            activeFiles, outputComponent, exists));
+                    myThreadPool.submit(new WorkDoneNotifier(result, copyReading1,
+                            activeFiles, outputComponent, exists, copyReading));
                 }
 
             } catch (InterruptedException e) {

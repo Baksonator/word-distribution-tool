@@ -16,18 +16,20 @@ public class WorkDoneNotifier extends Task {
 
     private Future<Map<String, Long>> result;
     private String activeFileName;
+    private String activeFileName1;
     private ObservableList<String> activeFiles;
     private Object lock = new Object();
     private CacheOutput cacheOutput;
     private boolean exists;
 
     public WorkDoneNotifier(Future<Map<String, Long>> result, String activeFileName, ObservableList activeFiles,
-                            CacheOutput cacheOutput, boolean exists) {
+                            CacheOutput cacheOutput, boolean exists, String activeFileName1) {
         this.result = result;
         this.activeFileName = activeFileName;
         this.activeFiles = activeFiles;
         this.cacheOutput = cacheOutput;
         this.exists = exists;
+        this.activeFileName1 = activeFileName1;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class WorkDoneNotifier extends Task {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    activeFiles.remove(activeFileName.split("/")[activeFileName.split("/").length - 1]);
+                    activeFiles.remove(activeFileName1.split("/")[activeFileName1.split("/").length - 1]);
                 }
             });
 
