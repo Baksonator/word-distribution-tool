@@ -3,9 +3,8 @@ package gui.controllers;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import output.CacheOutput;
@@ -35,27 +34,59 @@ public class SumResultConfirmation implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        ProgressBar progressBar = new ProgressBar();
-        vBox.getChildren().add(progressBar);
-
         String text = tfName.getText();
+
+        if (resultsList.contains(text) || resultsList.contains(text + "*")) {
+            resultExists();
+            return;
+        }
+
+        ProgressBar progressBar = new ProgressBar();
+        Label barLabel = new Label(text);
+        vBox.getChildren().add(progressBar);
+        vBox.getChildren().add(barLabel);
 
         resultsList.add(text + "*");
 
         List<String> resultsToSum = new ArrayList<>();
         for (String string : resultsListView.getSelectionModel().getSelectedItems()) {
             for (String name : cacheOutput.getResults().keySet()) {
-                if (string.equals(name.split("/")[name.split("/").length - 1])) {
-                    resultsToSum.add(name);
+                if (string.endsWith("*")) {
+                    if (string.substring(0, string.length() - 1).equals(name.split("/")[name.split("/").length - 1])) {
+                        resultsToSum.add(name);
+                    }
+                } else {
+                    if (string.equals(name.split("/")[name.split("/").length - 1])) {
+                        resultsToSum.add(name);
+                    }
                 }
             }
         }
 
-        Unifier unifier = new Unifier(resultsToSum, cacheOutput, vBox, progressBar, text, resultsList);
-        progressBar.progressProperty().bind(unifier.progressProperty());
-
-        cacheOutput.union(tfName.getText(), unifier);
+        Unifier unifier = new Unifier(resultsToSum, cacheOutput, vBox, progressBar, text, resultsList, barLabel);
+//        progressBar.progressProperty().bind(unifier.progressProperty());
 
         stage.close();
+
+        cacheOutput.union(text, unifier);
+    }
+
+    private void resultExists() {
+        Stage stage = new Stage();
+        stage.setTitle("Result with that name exists");
+
+        VBox vBox = new VBox();
+
+        Button okBtn = new Button("OK");
+        okBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                stage.close();
+            }
+        });
+        vBox.getChildren().add(okBtn);
+
+        stage.setScene(new Scene(vBox, 300, 300));
+        stage.show();
     }
 }

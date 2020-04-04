@@ -2,6 +2,7 @@ package gui;
 
 import app.App;
 import gui.controllers.OutputResultsListViewChange;
+import gui.controllers.SingleResultAction;
 import gui.controllers.SumResultAction;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -54,6 +55,7 @@ public class OutputPane extends HBox {
 
         singleResultBtn = new Button("Single result");
         singleResultBtn.setDisable(true);
+        singleResultBtn.setOnAction(new SingleResultAction(resultsListView, cacheOutput, resultChart, vbox));
 
         sumResultBtn = new Button("Sum result");
         sumResultBtn.setDisable(true);

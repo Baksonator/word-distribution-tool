@@ -5,10 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CacheOutput extends OutputComponent {
@@ -17,6 +14,8 @@ public class CacheOutput extends OutputComponent {
     private ConcurrentHashMap<String, Future<Map<String, Long>>> results;
     private int sortProgressLimit;
     private AtomicBoolean workFinished;
+    private ExecutorService sortThreadPool;
+    private ConcurrentHashMap<String, Map<String, Long>> sumResults;
 
     public CacheOutput(int sortProgressLimit, ObservableList<String> resultObservableList) {
         super();
@@ -24,6 +23,7 @@ public class CacheOutput extends OutputComponent {
         this.sortProgressLimit = sortProgressLimit;
         this.resultObservableList = resultObservableList;
         this.workFinished = new AtomicBoolean(false);
+        this.sortThreadPool = Executors.newCachedThreadPool();
     }
 
     @Override
@@ -54,11 +54,27 @@ public class CacheOutput extends OutputComponent {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        sortThreadPool.shutdown();
+        try {
+            sortThreadPool.awaitTermination(100, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         workFinished.set(true);
     }
 
     public void union(String resultName, Unifier unifier) {
-        results.put(resultName, (Future<Map<String, Long>>) App.outputThreadPool.submit(unifier));
+//        Future<Map<String, Long>> future = App.outputThreadPool.submit(unifier);
+        results.put(resultName, ((Future<Map<String, Long>>)App.outputThreadPool.submit(unifier)));
+        System.out.println(resultName);
+        System.out.println("IS IT DONE " + results.get(resultName).isDone());
+//        try {
+//            System.out.println(results.get(resultName).get().size());
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public Map<String, Long> take(String resultName) {
@@ -107,5 +123,13 @@ public class CacheOutput extends OutputComponent {
 
     public void setResultObservableList(ObservableList<String> resultObservableList) {
         this.resultObservableList = resultObservableList;
+    }
+
+    public int getSortProgressLimit() {
+        return sortProgressLimit;
+    }
+
+    public ExecutorService getSortThreadPool() {
+        return sortThreadPool;
     }
 }

@@ -55,7 +55,7 @@ public class CounterCruncher extends CruncherComponent {
                     break;
                 }
 
-                String copyReading = currentFile.fileName.replace("\\", "/");
+                String copyReading = currentFile.fileName.replace("\\", "/") + "-arity" + arity;
 //                activeFiles.add(copyReading);
 
                 Platform.runLater(new Runnable() {
@@ -87,6 +87,7 @@ public class CounterCruncher extends CruncherComponent {
                 Iterator<OutputComponent> outputComponentIterator = outputComponents.iterator();
                 while (outputComponentIterator.hasNext()) {
                     CacheOutput outputComponent = (CacheOutput)outputComponentIterator.next();
+//                    copyReading += "-arity" + arity;
                     ProcessedFile processedFile = new ProcessedFile(copyReading,
                             result);
 
