@@ -18,11 +18,11 @@ public class CacheOutput extends OutputComponent {
     private int sortProgressLimit;
     private AtomicBoolean workFinished;
 
-    public CacheOutput(int sortProgressLimit) {
+    public CacheOutput(int sortProgressLimit, ObservableList<String> resultObservableList) {
         super();
         this.results = new ConcurrentHashMap();
         this.sortProgressLimit = sortProgressLimit;
-        this.resultObservableList = FXCollections.observableArrayList(); // TODO Ovo treba da se setuje iz GUI-a
+        this.resultObservableList = resultObservableList;
         this.workFinished = new AtomicBoolean(false);
     }
 
@@ -103,5 +103,9 @@ public class CacheOutput extends OutputComponent {
 
     public ConcurrentHashMap<String, Future<Map<String, Long>>> getResults() {
         return results;
+    }
+
+    public void setResultObservableList(ObservableList<String> resultObservableList) {
+        this.resultObservableList = resultObservableList;
     }
 }

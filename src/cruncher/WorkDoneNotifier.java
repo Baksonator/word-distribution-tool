@@ -17,18 +17,15 @@ public class WorkDoneNotifier extends Task {
     private Future<Map<String, Long>> result;
     private String activeFileName;
     private ObservableList<String> activeFiles;
-    private CopyOnWriteArrayList<ObservableList<String>> resultObservableLists;
     private Object lock = new Object();
     private CacheOutput cacheOutput;
     private boolean exists;
 
     public WorkDoneNotifier(Future<Map<String, Long>> result, String activeFileName, ObservableList activeFiles,
-                            CopyOnWriteArrayList<ObservableList<String>> resultObservableList, CacheOutput cacheOutput,
-                            boolean exists) {
+                            CacheOutput cacheOutput, boolean exists) {
         this.result = result;
         this.activeFileName = activeFileName;
         this.activeFiles = activeFiles;
-        this.resultObservableLists = resultObservableList;
         this.cacheOutput = cacheOutput;
         this.exists = exists;
     }
@@ -40,6 +37,14 @@ public class WorkDoneNotifier extends Task {
 
             if (exists) {
                 cacheOutput.getResults().put(activeFileName, result);
+            } else {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        String toPut = activeFileName.split("/")[activeFileName.split("/").length - 1];
+                        cacheOutput.getResultObservableList().set(cacheOutput.getResultObservableList().indexOf(toPut + "*"), toPut);
+                    }
+                });
             }
 
             // Ovo je za aktivne fajlove i zvezdicu

@@ -66,11 +66,11 @@ public class CounterCruncher extends CruncherComponent {
                 });
 
                 // Ovo je za zvezdicu
-                CopyOnWriteArrayList<ObservableList<String>> resultObservableLists = new CopyOnWriteArrayList<>();
-                for (OutputComponent output : outputComponents) {
-                    ((CacheOutput)output).getResultObservableList().add(currentFile.fileName + "-arity" + arity + "*");
-                    resultObservableLists.add(((CacheOutput)output).getResultObservableList());
-                }
+//                CopyOnWriteArrayList<ObservableList<String>> resultObservableLists = new CopyOnWriteArrayList<>();
+//                for (OutputComponent output : outputComponents) {
+//                    ((CacheOutput)output).getResultObservableList().add(currentFile.fileName + "-arity" + arity + "*");
+//                    resultObservableLists.add(((CacheOutput)output).getResultObservableList());
+//                }
 
 
                 Future<Map<String, Long>> result = App.cruncherThreadPool.submit(new BagOfWordsCounter(counterLimit,
@@ -93,11 +93,18 @@ public class CounterCruncher extends CruncherComponent {
                     boolean exists = false;
                     if (!outputComponent.getResults().containsKey(copyReading)) {
                         outputComponent.getInputQueue().put(processedFile);
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                outputComponent.getResultObservableList().add(copyReading.split("/")[copyReading.split("/").length - 1] + "*");
+                            }
+                        });
+                    } else {
                         exists = true;
                     }
 
                     myThreadPool.submit(new WorkDoneNotifier(result, copyReading,
-                            activeFiles, resultObservableLists, outputComponent, exists));
+                            activeFiles, outputComponent, exists));
                 }
 
             } catch (InterruptedException e) {

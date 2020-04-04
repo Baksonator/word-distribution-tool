@@ -3,6 +3,7 @@ package app;
 import cruncher.CounterCruncher;
 import gui.CruncherPane;
 import gui.FileInputsPane;
+import gui.OutputPane;
 import gui.controllers.ShutdownAction;
 import javafx.application.Application;
 import javafx.geometry.Orientation;
@@ -43,7 +44,7 @@ public class App extends Application {
     public FileInputsPane fileInputs;
     public CruncherPane crunchers;
     // TODO Graph
-    public VBox output = new VBox();
+    public OutputPane output;
 
     public static Stage primaryStage;
 
@@ -194,11 +195,9 @@ public class App extends Application {
 //        cruncherThreadPool = Executors.newCachedThreadPool();
         outputThreadPool = Executors.newCachedThreadPool();
 
-        cacheOutput = new CacheOutput(Integer.parseInt(prop.getProperty("sort_progress_limit")));
-        Thread cachecOutputThread = new Thread(cacheOutput);
-        cachecOutputThread.start();
         //////////////////////////////////////////////////////////////////////
 
+        output = new OutputPane(this);
 
         fileInputs = new FileInputsPane(this);
 
