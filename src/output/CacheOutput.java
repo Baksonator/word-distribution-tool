@@ -49,18 +49,18 @@ public class CacheOutput extends OutputComponent {
         }
 
         App.outputThreadPool.shutdown();
-        try {
-            App.outputThreadPool.awaitTermination(100, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            App.outputThreadPool.awaitTermination(100, TimeUnit.DAYS);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         sortThreadPool.shutdown();
-        try {
-            sortThreadPool.awaitTermination(100, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        workFinished.set(true);
+//        try {
+//            sortThreadPool.awaitTermination(100, TimeUnit.DAYS);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        workFinished.set(true);
     }
 
     public void union(String resultName, Unifier unifier) {

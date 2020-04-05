@@ -71,12 +71,12 @@ public class WorkAssigner extends Task<String> {
 
         }
         App.inputThreadPool.shutdown();
-        try {
-            App.inputThreadPool.awaitTermination(100, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        workFinished.set(true);
+//        try {
+//            App.inputThreadPool.awaitTermination(100, TimeUnit.DAYS);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        workFinished.set(true);
     }
 
     public BlockingQueue<String> getFilesToRead() {

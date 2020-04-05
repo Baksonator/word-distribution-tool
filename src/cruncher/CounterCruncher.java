@@ -115,14 +115,14 @@ public class CounterCruncher extends CruncherComponent {
 
         }
 
-        App.cruncherThreadPool.awaitQuiescence(100, TimeUnit.SECONDS);
+//        App.cruncherThreadPool.awaitQuiescence(100, TimeUnit.SECONDS);
         myThreadPool.shutdown();
-        try {
-            myThreadPool.awaitTermination(100, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        workFinished.set(true);
+//        try {
+//            myThreadPool.awaitTermination(100, TimeUnit.DAYS);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        workFinished.set(true);
     }
 
     public void stop() {
@@ -144,5 +144,9 @@ public class CounterCruncher extends CruncherComponent {
 
     public AtomicBoolean getWorkFinished() {
         return workFinished;
+    }
+
+    public ExecutorService getMyThreadPool() {
+        return myThreadPool;
     }
 }
