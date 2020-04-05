@@ -56,7 +56,9 @@ public class ShutdownAction implements EventHandler<WindowEvent> {
 
                 App.cruncherThreadPool.awaitQuiescence(100, TimeUnit.DAYS);
                 try {
-                    App.inputThreadPool.awaitTermination(100, TimeUnit.DAYS);
+                    if (App.inputThreadPool.isShutdown()) {
+                        App.inputThreadPool.awaitTermination(100, TimeUnit.DAYS);
+                    }
                     App.outputThreadPool.awaitTermination(100, TimeUnit.DAYS);
 
                     for (SingleCruncherPane singleCruncherPane : app.crunchers.getSingleCruncherPanes()) {

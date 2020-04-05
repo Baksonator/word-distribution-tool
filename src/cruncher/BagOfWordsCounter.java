@@ -288,6 +288,10 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                     }
                 });
 
+                App.inputThreadPool.shutdownNow();
+                App.cruncherThreadPool.shutdownNow();
+                App.outputThreadPool.shutdownNow();
+
                 stage.setScene(new Scene(vBox, 300, 300));
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.showAndWait();
