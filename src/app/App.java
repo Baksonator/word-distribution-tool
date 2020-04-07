@@ -43,7 +43,6 @@ public class App extends Application {
 
     public FileInputsPane fileInputs;
     public CruncherPane crunchers;
-    // TODO Graph
     public OutputPane output;
 
     public static Stage primaryStage;
@@ -61,7 +60,6 @@ public class App extends Application {
 //            e.printStackTrace();
 //        }
 //
-//        // TODO Threadpool size read froom number of disks
 //        inputThreadPool = Executors.newFixedThreadPool(App.prop.getProperty("disks").split(";").length);
 //        cruncherThreadPool = ForkJoinPool.commonPool();
 ////        cruncherThreadPool = Executors.newCachedThreadPool();
@@ -188,8 +186,7 @@ public class App extends Application {
             e.printStackTrace();
         }
 
-        // TODO Threadpool size read froom number of disks
-        inputThreadPool = Executors.newFixedThreadPool(2);
+        inputThreadPool = Executors.newFixedThreadPool(prop.getProperty("disks").split(";").length);
         cruncherThreadPool = ForkJoinPool.commonPool();
 //        cruncherThreadPool = new ForkJoinPool(60);
 //        cruncherThreadPool = Executors.newCachedThreadPool();

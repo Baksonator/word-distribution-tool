@@ -37,6 +37,7 @@ public class SingleResultAction implements EventHandler<ActionEvent> {
         String selectedResult = resultsListView.getSelectionModel().getSelectedItem();
 
         if (!selectedResult.endsWith("*")) {
+            String nameToShow = selectedResult;
             for (String name : cacheOutput.getResults().keySet()) {
                 if (name.endsWith(selectedResult)) {
                     selectedResult = name;
@@ -62,7 +63,7 @@ public class SingleResultAction implements EventHandler<ActionEvent> {
             if (unsortedResult != null) {
 
                 ProgressBar progressBar = new ProgressBar();
-                Label barLabel = new Label(selectedResult);
+                Label barLabel = new Label(nameToShow);
                 vBox.getChildren().add(progressBar);
                 vBox.getChildren().add(barLabel);
 

@@ -45,7 +45,6 @@ public class FileInputsPane extends VBox {
         addFileInputBtn = new Button("Add File Input");
         addFileInputBtn.setOnAction(new AddFileInputAction(addedDisks, this));
 
-        // TODO Reorganize this
         diskList.valueProperty().addListener(new FileInputComboBoxChange(addedDisks, addFileInputBtn));
 
         getChildren().add(inputsHeader);

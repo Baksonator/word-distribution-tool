@@ -80,6 +80,7 @@ public class SorterTask extends Task {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                resultChart.getData().clear();
                 resultChart.getData().addAll(series);
                 vBox.getChildren().remove(progressBar);
                 vBox.getChildren().remove(barProgress);

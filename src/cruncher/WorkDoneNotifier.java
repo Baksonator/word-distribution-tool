@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import output.CacheOutput;
+import output.ProcessedFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,9 @@ public class WorkDoneNotifier extends Task {
             Map<String, Long> realRes = result.get();
 
             if (exists) {
-                cacheOutput.getResults().put(activeFileName, result);
+//                cacheOutput.getResults().put(activeFileName, result);
+                ProcessedFile processedFile = new ProcessedFile(activeFileName, result);
+                cacheOutput.getInputQueue().put(processedFile);
             } else {
                 Platform.runLater(new Runnable() {
                     @Override
@@ -61,7 +64,6 @@ public class WorkDoneNotifier extends Task {
 //            for (ObservableList<String> resultObservableList : resultObservableLists) {
 //                resultObservableList.set(resultObservableList.indexOf(activeFileName), activeFileName);
 //            }
-            // TODO Pitaj da ako vec postoji tu
 
 
             System.out.println(realRes.keySet().size());
