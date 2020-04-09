@@ -1,10 +1,9 @@
 package input;
 
-import javafx.scene.control.Label;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,7 +13,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class FileInput extends InputCompontent  {
 
     private WorkAssigner workAssigner;
-    private final String disk;
     private final int sleepTime;
     private CopyOnWriteArrayList<String> directories;
     private ConcurrentHashMap<String, Long> lastModifiedFile;
@@ -23,11 +21,11 @@ public class FileInput extends InputCompontent  {
     private BlockingQueue<String> filesToRead;
     private final Object pauseSleepLock;
     private volatile boolean working;
-    private Label activeJobLabel;
+    private final Object stopLock;
+    private AtomicBoolean stopped;
 
-    public FileInput(String disk, int sleepTime) {
+    public FileInput(int sleepTime) {
         super();
-        this.disk = disk;
         this.sleepTime = sleepTime;
         this.directories = new CopyOnWriteArrayList<>();
         this.lastModifiedFile = new ConcurrentHashMap<>();
@@ -35,7 +33,9 @@ public class FileInput extends InputCompontent  {
         this.paused = new AtomicBoolean(true);
         this.filesToRead = new LinkedBlockingQueue<>();
         this.pauseSleepLock = new Object();
-        this.workAssigner = new WorkAssigner(this.filesToRead, this.cruncherComponents);
+        this.stopLock = new Object();
+        this.stopped = new AtomicBoolean(false);
+        this.workAssigner = new WorkAssigner(this.filesToRead, this.cruncherComponents, this.stopLock, this.stopped);
         this.working = true;
     }
 
@@ -51,6 +51,10 @@ public class FileInput extends InputCompontent  {
                         pauseSleepLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }
+
+                    if (!working) {
+                        break;
                     }
                 }
             }
@@ -83,7 +87,7 @@ public class FileInput extends InputCompontent  {
     }
 
     private void readDirectory(File directory, String parentDirectory) throws InterruptedException {
-        for (File fileEntry : directory.listFiles()) {
+        for (File fileEntry : Objects.requireNonNull(directory.listFiles())) {
 
             if (fileEntry.isDirectory()) {
 
@@ -98,6 +102,7 @@ public class FileInput extends InputCompontent  {
                         workAssigner.getFilesToRead().put(fileEntry.getAbsolutePath());
                         lastModifiedFile.put(fileEntry.getAbsolutePath(), fileEntry.lastModified());
                         parentDirectories.put(fileEntry.getAbsolutePath(), parentDirectory);
+
                     }
 
                 } else {
@@ -105,6 +110,7 @@ public class FileInput extends InputCompontent  {
                     workAssigner.getFilesToRead().put(fileEntry.getAbsolutePath());
                     lastModifiedFile.put(fileEntry.getAbsolutePath(), fileEntry.lastModified());
                     parentDirectories.put(fileEntry.getAbsolutePath(), parentDirectory);
+
                 }
             }
         }
@@ -114,6 +120,10 @@ public class FileInput extends InputCompontent  {
         try {
             working = false;
             workAssigner.getFilesToRead().put("\\");
+            stopped.compareAndSet(false, true);
+            synchronized (stopLock) {
+                stopLock.wait();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -146,10 +156,6 @@ public class FileInput extends InputCompontent  {
 
     public AtomicBoolean getPaused() {
         return paused;
-    }
-
-    public void setPaused(AtomicBoolean paused) {
-        this.paused = paused;
     }
 
     public Object getPauseSleepLock() {

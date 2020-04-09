@@ -14,22 +14,9 @@ import javafx.scene.layout.VBox;
 
 public class SingleFileInputPane extends VBox {
 
-    private Label nameLabel;
-    private Label crunchersLabel;
     private ObservableList<String> addedCrunchersList;
-    private ListView<String> addedCrunchersListView;
     private ObservableList<String> crunchersList;
     private ComboBox<String> crunchersComboBox;
-    private Button linkCruncherBtn;
-    private Button unlinkCruncherBtn;
-    private Label dirsLabel;
-    private ObservableList<String> dirsList;
-    private ListView<String> dirsListView;
-    private Button addDirBtn;
-    private Button removeDirBtn;
-    private Button startBtn;
-    private Button removeDiskInputBtn;
-    private Label activeJobLabel;
     private String disk;
     private int componentCount;
     private FileInput fileInputComponent;
@@ -40,7 +27,7 @@ public class SingleFileInputPane extends VBox {
         this.componentCount = fileInputsPane.getPaneCounter();
         this.fileInputsPane = fileInputsPane;
 
-        this.fileInputComponent = new FileInput(disk, Integer.parseInt(App.prop.getProperty("file_input_sleep_time")));
+        this.fileInputComponent = new FileInput(Integer.parseInt(App.prop.getProperty("file_input_sleep_time")));
 
         initScene();
         startComponent();
@@ -52,12 +39,12 @@ public class SingleFileInputPane extends VBox {
     }
 
     private void initScene() {
-        nameLabel = new Label("File Input " + componentCount + ": " + disk);
+        Label nameLabel = new Label("File Input " + componentCount + ": " + disk);
 
-        crunchersLabel = new Label("Crunchers");
+        Label crunchersLabel = new Label("Crunchers");
 
         addedCrunchersList = FXCollections.observableArrayList();
-        addedCrunchersListView = new ListView<>(addedCrunchersList);
+        ListView<String> addedCrunchersListView = new ListView<>(addedCrunchersList);
         addedCrunchersListView.setMaxWidth(200);
 
         crunchersList = FXCollections.observableArrayList();
@@ -70,10 +57,10 @@ public class SingleFileInputPane extends VBox {
         }
 
         HBox linkingHbox = new HBox();
-        linkCruncherBtn = new Button("Link cruncher");
+        Button linkCruncherBtn = new Button("Link cruncher");
         linkCruncherBtn.setDisable(true);
         linkCruncherBtn.setOnAction(new LinkCruncher(crunchersComboBox, addedCrunchersList, this, linkCruncherBtn));
-        unlinkCruncherBtn = new Button("Unlink cruncher");
+        Button unlinkCruncherBtn = new Button("Unlink cruncher");
         unlinkCruncherBtn.setDisable(true);
         unlinkCruncherBtn.setOnAction(new UnlinkCruncher(addedCrunchersListView, addedCrunchersList, this,
                 linkCruncherBtn, crunchersComboBox));
@@ -86,32 +73,32 @@ public class SingleFileInputPane extends VBox {
         crunchersComboBox.valueProperty().addListener(new CruncherComboBoxChange(linkCruncherBtn, addedCrunchersList));
         addedCrunchersListView.getSelectionModel().selectedItemProperty().addListener(new CruncherListViewChange(unlinkCruncherBtn));
 
-        dirsLabel = new Label("Dirs:");
+        Label dirsLabel = new Label("Dirs:");
 
-        dirsList = FXCollections.observableArrayList();
-        dirsListView = new ListView<>(dirsList);
+        ObservableList<String> dirsList = FXCollections.observableArrayList();
+        ListView<String> dirsListView = new ListView<>(dirsList);
         dirsListView.setMaxWidth(200);
 
         HBox dirsHbox = new HBox();
-        addDirBtn = new Button("Add dir");
+        Button addDirBtn = new Button("Add dir");
         addDirBtn.setOnAction(new AddDirAction(fileInputComponent, dirsList, disk));
-        removeDirBtn = new Button("Remove dir");
+        Button removeDirBtn = new Button("Remove dir");
         removeDirBtn.setDisable(true);
-        removeDirBtn.setOnAction(new RemoveDirAction(fileInputComponent, dirsList, dirsListView, removeDirBtn, disk));
+        removeDirBtn.setOnAction(new RemoveDirAction(fileInputComponent, dirsList, dirsListView, removeDirBtn));
         dirsHbox.getChildren().add(addDirBtn);
         dirsHbox.getChildren().add(removeDirBtn);
 
         dirsListView.getSelectionModel().selectedItemProperty().addListener(new DirsListViewChange(removeDirBtn));
 
         HBox lastHbox = new HBox();
-        startBtn = new Button("Start");
+        Button startBtn = new Button("Start");
         startBtn.setOnAction(new StartPauseAction(fileInputComponent, startBtn));
-        removeDiskInputBtn = new Button("Remove disk input");
+        Button removeDiskInputBtn = new Button("Remove disk input");
         removeDiskInputBtn.setOnAction(new RemoveFileInputAction(fileInputsPane, this));
         lastHbox.getChildren().add(startBtn);
         lastHbox.getChildren().add(removeDiskInputBtn);
 
-        activeJobLabel = new Label("Idle");
+        Label activeJobLabel = new Label("Idle");
         activeJobLabel.textProperty().bind(fileInputComponent.getWorkAssigner().messageProperty());
 
         getChildren().add(nameLabel);

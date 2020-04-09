@@ -64,7 +64,6 @@ public class SumResultConfirmation implements EventHandler<ActionEvent> {
         }
 
         Unifier unifier = new Unifier(resultsToSum, cacheOutput, vBox, progressBar, text, resultsList, barLabel);
-//        progressBar.progressProperty().bind(unifier.progressProperty());
 
         stage.close();
 
@@ -78,12 +77,7 @@ public class SumResultConfirmation implements EventHandler<ActionEvent> {
         VBox vBox = new VBox();
 
         Button okBtn = new Button("OK");
-        okBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                stage.close();
-            }
-        });
+        okBtn.setOnAction(event -> stage.close());
         vBox.getChildren().add(okBtn);
 
         stage.setScene(new Scene(vBox, 300, 300));

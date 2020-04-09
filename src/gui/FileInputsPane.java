@@ -15,8 +15,6 @@ import java.util.List;
 
 public class FileInputsPane extends VBox {
 
-    private Label inputsHeader;
-    private ObservableList<String> disks;
     private ComboBox<String> diskList;
     private Button addFileInputBtn;
     private List<String> addedDisks;
@@ -34,11 +32,11 @@ public class FileInputsPane extends VBox {
     }
 
     private void initScene() {
-        inputsHeader = new Label("File inputs");
+        Label inputsHeader = new Label("File inputs");
 
         String allDisks = App.prop.getProperty("disks");
         String[] disksSeprated = allDisks.split(";");
-        disks = FXCollections.observableArrayList(disksSeprated);
+        ObservableList<String> disks = FXCollections.observableArrayList(disksSeprated);
         diskList = new ComboBox<>(disks);
         diskList.getSelectionModel().select(0);
 

@@ -6,7 +6,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -40,12 +39,7 @@ public class SumResultAction implements EventHandler<ActionEvent> {
         Button okBtn = new Button("OK");
         okBtn.setOnAction(new SumResultConfirmation(vBox, cacheOutput, resultsListView, tfName, resultsList, stage));
         Button cancelBtn = new Button("Cancel");
-        cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                stage.close();
-            }
-        });
+        cancelBtn.setOnAction(event1 -> stage.close());
         hBox.getChildren().add(okBtn);
         hBox.getChildren().add(cancelBtn);
 

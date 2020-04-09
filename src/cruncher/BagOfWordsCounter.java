@@ -2,14 +2,11 @@ package cruncher;
 
 import app.App;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -124,7 +121,7 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                 ArrayList<Future<Map<String, Long>>> threadCounters = new ArrayList<>();
 
                 Map<String, Long> cornerBags = new HashMap<>();
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb;
 
                 int lastIndex = 0;
                 for (int l = counterLimit; l < text.length(); l += counterLimit) {
@@ -189,67 +186,56 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
                     lastIndex = l + 1;
                 }
 
-                System.out.println("Pustio");
-
                 for (BagOfWordsCounter bagOfWordsCounter : counters) {
-//                threadCounters.add(App.cruncherThreadPool.submit(bagOfWordsCounter));
+//                    threadCounters.add(App.cruncherThreadPool.submit(bagOfWordsCounter));
                     bagOfWordsCounter.fork();
                 }
 
-                BagOfWordsCounter thisBagOfWordsCounter = new BagOfWordsCounter(counterLimit, text, arity, true, lastIndex, text.length());
-//            Future<Map<String, Long>> lastBitFuture = App.cruncherThreadPool.submit(thisBagOfWordsCounter);
+                BagOfWordsCounter thisBagOfWordsCounter = new BagOfWordsCounter(counterLimit, text, arity, true,
+                        lastIndex, text.length());
+//                Future<Map<String, Long>> lastBitFuture = App.cruncherThreadPool.submit(thisBagOfWordsCounter);
                 Map<String, Long> lastBit = thisBagOfWordsCounter.compute();
 
                 List<Map<String, Long>> resultList = new ArrayList<>();
 
-//            for (Future<Map<String, Long>> bagOfWordsCounterFuture : threadCounters) {
-//                try {
-//                    resultList.add(bagOfWordsCounterFuture.get());
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                } catch (ExecutionException e) {
-//                    e.printStackTrace();
+//                for (Future<Map<String, Long>> bagOfWordsCounterFuture : threadCounters) {
+//                    try {
+//                        resultList.add(bagOfWordsCounterFuture.get());
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    } catch (ExecutionException e) {
+//                        e.printStackTrace();
+//                    }
 //                }
-//            }
 
                 for (BagOfWordsCounter bagOfWordsCounter : counters) {
                     resultList.add(bagOfWordsCounter.join());
                 }
 
-//            Map<String, Long> lastBit = null;
-//            try {
-//                lastBit = lastBitFuture.get();
-//            } catch (InterruptedException e) {
+//                Map<String, Long> lastBit = null;
+//                try {
+//                    lastBit = lastBitFuture.get();
+//                } catch (InterruptedException e) {
 //
 //
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            }
-
-                System.out.println("Stigao");
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();
+//                }
 
                 for (Map<String, Long> singleMap : resultList) {
-                    for (String key : singleMap.keySet()) {
-                        if (lastBit.containsKey(key)) {
-                            lastBit.put(key, lastBit.get(key) + singleMap.get(key));
-                        } else {
-                            lastBit.put(key, singleMap.get(key));
-                        }
+                    for (Map.Entry<String, Long> entry : singleMap.entrySet()) {
+                        lastBit.merge(entry.getKey(), entry.getValue(), Long::sum);
                     }
                     singleMap = null;
                 }
 
-                for (String key : cornerBags.keySet()) {
-                    if (lastBit.containsKey(key)) {
-                        lastBit.put(key, lastBit.get(key) + cornerBags.get(key));
-                    } else {
-                        lastBit.put(key, cornerBags.get(key));
-                    }
+                for (Map.Entry<String, Long> entry : cornerBags.entrySet()) {
+                    lastBit.merge(entry.getKey(), entry.getValue(), Long::sum);
                 }
 
                 text = null;
 
-                System.gc();
+//                System.gc();
 
                 return lastBit;
             }
@@ -262,40 +248,31 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
     }
 
     private void stopApp() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                Stage stage = new Stage();
-                stage.setTitle("Shutting down");
+        Platform.runLater(() -> {
+            Stage stage = new Stage();
+            stage.setTitle("Out of memory - Shutting down");
 
-                VBox vBox = new VBox();
+            VBox vBox = new VBox();
 
-                Button okBtn = new Button("OK");
-                okBtn.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        Platform.exit();
-                        System.exit(0);
-                    }
-                });
-                vBox.getChildren().add(okBtn);
+            Button okBtn = new Button("OK");
+            okBtn.setOnAction(event -> {
+                Platform.exit();
+                System.exit(0);
+            });
+            vBox.getChildren().add(okBtn);
 
-                stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent event) {
-                        Platform.exit();
-                        System.exit(0);
-                    }
-                });
+            stage.setOnCloseRequest(event -> {
+                Platform.exit();
+                System.exit(0);
+            });
 
-                App.inputThreadPool.shutdownNow();
-                App.cruncherThreadPool.shutdownNow();
-                App.outputThreadPool.shutdownNow();
+            App.inputThreadPool.shutdownNow();
+            App.outputThreadPool.shutdownNow();
+            App.cruncherThreadPool.shutdownNow();
 
-                stage.setScene(new Scene(vBox, 300, 300));
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.showAndWait();
-            }
+            stage.setScene(new Scene(vBox, 300, 300));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
         });
     }
 

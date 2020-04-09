@@ -1,6 +1,5 @@
 package gui.controllers;
 
-import app.App;
 import gui.SorterTask;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,8 +14,6 @@ import javafx.stage.Stage;
 import output.CacheOutput;
 
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 public class SingleResultAction implements EventHandler<ActionEvent> {
 
@@ -47,18 +44,6 @@ public class SingleResultAction implements EventHandler<ActionEvent> {
 
             Map<String, Long> unsortedResult = cacheOutput.poll(selectedResult);
 
-//            for (Map.Entry<String, Future<Map<String, Long>>> entry : cacheOutput.getResults().entrySet()) {
-//                try {
-//                    System.out.println(entry.getKey());
-//                    System.out.println(entry.getValue());
-//                    System.out.println(entry.getValue().get());
-//                    System.out.println(entry.getKey() + " : " + entry.getValue().get().size());
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                } catch (ExecutionException e) {
-//                    e.printStackTrace();
-//                }
-//            }
 
             if (unsortedResult != null) {
 
@@ -86,12 +71,7 @@ public class SingleResultAction implements EventHandler<ActionEvent> {
         VBox vBox = new VBox();
 
         Button okBtn = new Button("OK");
-        okBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                stage.close();
-            }
-        });
+        okBtn.setOnAction(event -> stage.close());
         vBox.getChildren().add(okBtn);
 
         stage.setScene(new Scene(vBox, 300, 300));

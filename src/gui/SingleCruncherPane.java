@@ -13,16 +13,11 @@ import output.OutputComponent;
 
 public class SingleCruncherPane extends VBox {
 
-    private Label cruncherName;
-    private Label cruncherArity;
-    private Button removeCruncherButton;
     private CruncherPane cruncherPane;
     private CounterCruncher counterCruncher;
     private int arity;
     private String name;
-    private ListView<String> activeListView;
     private ObservableList<String> activeFiles;
-    private Label crunchingLabel;
 
     public SingleCruncherPane(int arity, CruncherPane cruncherPane, OutputComponent outputComponent) {
         activeFiles = FXCollections.observableArrayList();
@@ -42,18 +37,18 @@ public class SingleCruncherPane extends VBox {
 
     private void initScene() {
         int counter = cruncherPane.getCounter();
-        cruncherName = new Label("Name: Counter " + counter);
+        Label cruncherName = new Label("Name: Counter " + counter);
         this.name = "Counter " + counter;
 
-        cruncherArity = new Label("Arity: " + arity);
+        Label cruncherArity = new Label("Arity: " + arity);
 
-        removeCruncherButton = new Button("Remove cruncher");
+        Button removeCruncherButton = new Button("Remove cruncher");
         removeCruncherButton.setOnAction(new RemoveCruncherAction(cruncherPane, this));
 
-        crunchingLabel = new Label("Crunching:");
+        Label crunchingLabel = new Label("Crunching:");
 
 
-        activeListView = new ListView<>(activeFiles);
+        ListView<String> activeListView = new ListView<>(activeFiles);
         activeListView.setMaxWidth(100);
 
         getChildren().add(cruncherName);

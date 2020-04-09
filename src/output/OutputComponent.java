@@ -8,7 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class OutputComponent implements Runnable {
 
-    protected CopyOnWriteArrayList<CruncherComponent> cruncherComponents;
+    private CopyOnWriteArrayList<CruncherComponent> cruncherComponents;
     protected BlockingQueue<ProcessedFile> inputQueue;
 
     public OutputComponent() {

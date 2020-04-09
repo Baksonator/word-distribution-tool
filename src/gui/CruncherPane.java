@@ -11,8 +11,6 @@ import java.util.List;
 
 public class CruncherPane extends VBox {
 
-    private Label headerLabel;
-    private Button addCruncherBtn;
     private List<SingleCruncherPane> singleCruncherPanes;
     private App app;
     private int counter;
@@ -26,9 +24,9 @@ public class CruncherPane extends VBox {
     }
 
     private void initScene() {
-        headerLabel = new Label("Crunchers");
+        Label headerLabel = new Label("Crunchers");
 
-        addCruncherBtn = new Button("Add cruncher");
+        Button addCruncherBtn = new Button("Add cruncher");
         addCruncherBtn.setOnAction(new AddCruncherAction(this));
 
         getChildren().add(headerLabel);

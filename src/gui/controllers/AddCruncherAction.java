@@ -32,12 +32,7 @@ public class AddCruncherAction implements EventHandler<ActionEvent> {
         Button okBtn = new Button("OK");
         okBtn.setOnAction(new ConfirmCruncherCreation(cruncherPane, tfArity, stage));
         Button cancelBtn = new Button("Cancel");
-        cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                stage.close();
-            }
-        });
+        cancelBtn.setOnAction(event1 -> stage.close());
         hBox.getChildren().add(okBtn);
         hBox.getChildren().add(cancelBtn);
 

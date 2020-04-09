@@ -17,16 +17,10 @@ import output.CacheOutput;
 
 public class OutputPane extends HBox {
 
-    private LineChart<Number, Number> resultChart;
     private final NumberAxis xAxis = new NumberAxis();
     private final NumberAxis yAxis = new NumberAxis();
-    private ListView<String> resultsListView;
     private ObservableList<String> resultsList;
-    private Button singleResultBtn;
-    private Button sumResultBtn;
     private CacheOutput cacheOutput;
-    private App app;
-//    private ListView<String>
 
     public OutputPane(App app) {
         cacheOutput = new CacheOutput(Integer.parseInt(App.prop.getProperty("sort_progress_limit")), null);
@@ -44,20 +38,20 @@ public class OutputPane extends HBox {
     }
 
     private void initScene() {
-        resultChart = new LineChart<>(xAxis, yAxis);
+        LineChart<Number, Number> resultChart = new LineChart<>(xAxis, yAxis);
         resultChart.setPrefWidth(1000);
 
         VBox vbox = new VBox();
 
         resultsList = FXCollections.observableArrayList();
-        resultsListView = new ListView<>(resultsList);
+        ListView<String> resultsListView = new ListView<>(resultsList);
         resultsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        singleResultBtn = new Button("Single result");
+        Button singleResultBtn = new Button("Single result");
         singleResultBtn.setDisable(true);
         singleResultBtn.setOnAction(new SingleResultAction(resultsListView, cacheOutput, resultChart, vbox));
 
-        sumResultBtn = new Button("Sum result");
+        Button sumResultBtn = new Button("Sum result");
         sumResultBtn.setDisable(true);
         sumResultBtn.setOnAction(new SumResultAction(vbox, cacheOutput, resultsListView, resultsList));
 

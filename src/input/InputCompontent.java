@@ -16,10 +16,6 @@ public abstract class InputCompontent implements Runnable {
         return cruncherComponents;
     }
 
-    public void setCruncherComponents(CopyOnWriteArrayList<CruncherComponent> cruncherComponents) {
-        this.cruncherComponents = cruncherComponents;
-    }
-
     public void addCruncher(CruncherComponent cruncherComponent) { this.cruncherComponents.add(cruncherComponent); }
 
     public void deleteCruncher(CruncherComponent cruncherComponent) {

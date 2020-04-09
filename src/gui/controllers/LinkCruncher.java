@@ -35,10 +35,9 @@ public class LinkCruncher implements EventHandler<ActionEvent> {
                 getSingleCruncherPanes()
                 .stream()
                 .filter(cp -> cp.getName().equals(selectedItem))
-                .collect(Collectors.toList()).get(0).getCounterCruncher();
+                .findFirst().get().getCounterCruncher();
 
         singleFileInputPane.getFileInputComponent().addCruncher(counterCruncher);
-        counterCruncher.getInputCompontents().add(singleFileInputPane.getFileInputComponent());
         linkCruncherBtn.setDisable(true);
     }
 }

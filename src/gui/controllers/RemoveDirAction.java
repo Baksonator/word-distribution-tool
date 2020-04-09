@@ -14,14 +14,13 @@ public class RemoveDirAction implements EventHandler<ActionEvent> {
     private ObservableList<String> dirsList;
     private ListView<String> dirsListView;
     private Button removeDirBtn;
-    private String disk;
 
-    public RemoveDirAction(FileInput fileInputComponent, ObservableList<String> dirsList, ListView<String> dirsListView, Button removeDirBtn, String disk) {
+    public RemoveDirAction(FileInput fileInputComponent, ObservableList<String> dirsList, ListView<String> dirsListView,
+                           Button removeDirBtn) {
         this.fileInputComponent = fileInputComponent;
         this.dirsList = dirsList;
         this.dirsListView = dirsListView;
         this.removeDirBtn = removeDirBtn;
-        this.disk = disk;
     }
 
     @Override

@@ -9,8 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 
-import java.util.stream.Collectors;
-
 public class UnlinkCruncher implements EventHandler<ActionEvent> {
 
     private ListView<String> addedCrunchersListView;
@@ -38,7 +36,7 @@ public class UnlinkCruncher implements EventHandler<ActionEvent> {
                 getSingleCruncherPanes()
                 .stream()
                 .filter(cp -> cp.getName().equals(selectedItem))
-                .collect(Collectors.toList()).get(0).getCounterCruncher();
+                .findFirst().get().getCounterCruncher();
 
         singleFileInputPane.getFileInputComponent().deleteCruncher(counterCruncher);
 

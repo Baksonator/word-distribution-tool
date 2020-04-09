@@ -7,8 +7,6 @@ import gui.SingleFileInputPane;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-import java.util.stream.Collectors;
-
 public class RemoveCruncherAction implements EventHandler<ActionEvent> {
 
     private CruncherPane cruncherPane;
@@ -21,13 +19,9 @@ public class RemoveCruncherAction implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        for (SingleFileInputPane singleFileInputPane : cruncherPane.getApp().fileInputs.getFileInputPanes()) {
-            CounterCruncher counterCruncher = singleFileInputPane.getFileInputsPane().getApp().crunchers.
-                    getSingleCruncherPanes()
-                    .stream()
-                    .filter(cp -> cp.getName().equals(singleCruncherPane.getName()))
-                    .collect(Collectors.toList()).get(0).getCounterCruncher();
+        CounterCruncher counterCruncher = singleCruncherPane.getCounterCruncher();
 
+        for (SingleFileInputPane singleFileInputPane : cruncherPane.getApp().fileInputs.getFileInputPanes()) {
             singleFileInputPane.getFileInputComponent().deleteCruncher(counterCruncher);
 
             singleFileInputPane.getAddedCrunchersList().remove(singleCruncherPane.getName());

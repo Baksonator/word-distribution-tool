@@ -26,10 +26,6 @@ public abstract class CruncherComponent extends Task  {
         return inputQueue;
     }
 
-    public CopyOnWriteArrayList<InputCompontent> getInputCompontents() {
-        return inputCompontents;
-    }
-
     public CopyOnWriteArrayList<OutputComponent> getOutputComponents() {
         return outputComponents;
     }
