@@ -66,6 +66,7 @@ public class ShutdownAction implements EventHandler<WindowEvent> {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            System.out.println("Shutting down...");
 
             Platform.runLater(stage::close);
 

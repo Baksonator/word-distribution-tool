@@ -127,9 +127,9 @@ public class FileInput extends InputCompontent  {
     public void stop() {
         try {
             working = false;
-            workAssigner.getFilesToRead().put("\\");
             stopped.compareAndSet(false, true);
             synchronized (stopLock) {
+                workAssigner.getFilesToRead().put("\\");
                 stopLock.wait();
             }
         } catch (InterruptedException e) {

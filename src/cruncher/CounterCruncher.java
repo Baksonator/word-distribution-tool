@@ -84,8 +84,8 @@ public class CounterCruncher extends CruncherComponent {
 
     public void stop() {
         try {
-            inputQueue.put(new ReadFile("\\", ""));
             synchronized (stopLock) {
+                inputQueue.put(new ReadFile("\\", ""));
                 stopLock.wait();
             }
         } catch (InterruptedException e) {

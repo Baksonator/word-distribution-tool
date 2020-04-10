@@ -28,7 +28,7 @@ public class App extends Application {
 
     public static Properties prop = new Properties();
 
-    public static final String PATH = "C:/Users/Bogdan/IdeaProjects/kids_2020_d1_bogdan_bakarec_rn2016/";
+    public static String PATH;
 
     private HBox mainPane = new HBox();
 
@@ -48,7 +48,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        try (InputStream input = new FileInputStream("C:\\Users\\Bogdan\\IdeaProjects\\kids_2020_d1_bogdan_bakarec_rn2016\\data\\app.properties")) {
+        PATH = System.getProperty("user.dir") + "\\";
+
+        try (InputStream input = new FileInputStream(PATH + "data\\app.properties")) {
             prop.load(input);
         } catch (IOException e) {
             e.printStackTrace();

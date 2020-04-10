@@ -79,8 +79,8 @@ public class CacheOutput extends OutputComponent {
 
     public void stop() {
         try {
-            inputQueue.put(new ProcessedFile("\\", null));
             synchronized (stopLock) {
+                inputQueue.put(new ProcessedFile("\\", null));
                 stopLock.wait();
             }
         } catch (InterruptedException e) {
