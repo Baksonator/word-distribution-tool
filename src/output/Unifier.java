@@ -40,10 +40,14 @@ public class Unifier implements Callable<Map<String, Long>> {
 
         List<Map<String, Long>> results = new ArrayList<>();
 
-        for (String resultName : resultsToSum) {
-            Map<String, Long> mapResult = cacheOutput.take(resultName);
-            results.add(mapResult);
+        try {
+            for (String resultName : resultsToSum) {
+                Map<String, Long> mapResult = cacheOutput.take(resultName);
+                results.add(mapResult);
 
+            }
+        } catch (InterruptedException e) {
+            return null;
         }
 
         int jobSize = results.size();

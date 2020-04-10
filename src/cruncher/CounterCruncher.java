@@ -70,7 +70,11 @@ public class CounterCruncher extends CruncherComponent {
                 }
 
             } catch (InterruptedException e) {
+                Platform.runLater(() -> {
+                    activeFiles.clear();
+                });
                 e.printStackTrace();
+                return;
             }
 
         }
@@ -78,7 +82,6 @@ public class CounterCruncher extends CruncherComponent {
         synchronized (stopLock) {
             stopLock.notify();
         }
-//        myThreadPool.shutdown();
     }
 
     public void stop() {

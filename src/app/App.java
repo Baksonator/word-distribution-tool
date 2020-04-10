@@ -36,6 +36,10 @@ public class App extends Application {
     public CruncherPane crunchers;
     public OutputPane output;
 
+    public static FileInputsPane fileInputsPane1;
+    public static CruncherPane cruncherPane1;
+    public static OutputPane outputPane1;
+
     public static Stage primaryStage;
 
     public CacheOutput cacheOutput;
@@ -63,6 +67,10 @@ public class App extends Application {
         fileInputs = new FileInputsPane(this);
 
         crunchers = new CruncherPane(this);
+
+        fileInputsPane1 = fileInputs;
+        cruncherPane1 = crunchers;
+        outputPane1 = output;
 
         mainPane.getChildren().add(fileInputs);
         mainPane.getChildren().add(new Separator(Orientation.VERTICAL));

@@ -69,8 +69,13 @@ public class WorkAssigner extends Task<String> {
                 currentlyReading = "Idle";
                 updateMessage(currentlyReading);
 
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (ExecutionException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                currentlyReading = "Idle";
+                updateMessage(currentlyReading);
+                e.printStackTrace();
+                return;
             }
 
         }
@@ -78,7 +83,6 @@ public class WorkAssigner extends Task<String> {
         synchronized (stopLock) {
             stopLock.notify();
         }
-//        App.inputThreadPool.shutdown();
     }
 
     public BlockingQueue<String> getFilesToRead() {

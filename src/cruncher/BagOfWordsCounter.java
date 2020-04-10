@@ -1,6 +1,8 @@
 package cruncher;
 
 import app.App;
+import gui.SingleCruncherPane;
+import gui.SingleFileInputPane;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -269,6 +271,17 @@ public class BagOfWordsCounter extends RecursiveTask<Map<String, Long>> {
             App.inputThreadPool.shutdownNow();
             App.outputThreadPool.shutdownNow();
             App.cruncherThreadPool.shutdownNow();
+
+            for (SingleCruncherPane singleCruncherPane : App.cruncherPane1.getSingleCruncherPanes()) {
+                singleCruncherPane.getCounterCruncher().getMyThreadPool().shutdownNow();
+            }
+
+            for (SingleFileInputPane singleFileInputPane : App.fileInputsPane1.getFileInputPanes()) {
+                singleFileInputPane.getFileInputComponent().interrupt();
+                singleFileInputPane.getFileInputComponent().getWorkAssignerThread().interrupt();
+            }
+
+            App.outputPane1.getCacheOutput().getSortThreadPool().shutdownNow();
 
             stage.setScene(new Scene(vBox, 300, 300));
             stage.initModality(Modality.APPLICATION_MODAL);

@@ -1,6 +1,7 @@
 package output;
 
 import app.App;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 
 import java.util.Map;
@@ -40,24 +41,26 @@ public class CacheOutput extends OutputComponent {
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                Platform.runLater(() -> {
+                    resultObservableList.clear();
+                });
+                return;
             }
         }
 
         synchronized (stopLock) {
             stopLock.notify();
         }
-//        App.outputThreadPool.shutdown();
-//        sortThreadPool.shutdown();
     }
 
     public void union(String resultName, Unifier unifier) {
         results.put(resultName, App.outputThreadPool.submit(unifier));
     }
 
-    public Map<String, Long> take(String resultName) {
+    public Map<String, Long> take(String resultName) throws InterruptedException {
         try {
             return results.get(resultName).get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
         return null;

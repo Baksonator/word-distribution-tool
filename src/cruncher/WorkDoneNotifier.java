@@ -51,8 +51,13 @@ public class WorkDoneNotifier extends Task {
                     .split("/").length - 1]));
 
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            Platform.runLater(() -> {
+                activeFiles.clear();
+                cacheOutput.getResultObservableList().clear();
+            });
         }
     }
 

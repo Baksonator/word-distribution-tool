@@ -23,6 +23,7 @@ public class FileInput extends InputCompontent  {
     private volatile boolean working;
     private final Object stopLock;
     private AtomicBoolean stopped;
+    private Thread workAssignerThread;
 
     public FileInput(int sleepTime) {
         super();
@@ -41,7 +42,7 @@ public class FileInput extends InputCompontent  {
 
     @Override
     public void run() {
-        Thread workAssignerThread = new Thread(workAssigner);
+        workAssignerThread = new Thread(workAssigner);
         workAssignerThread.start();
 
         while (working) {
@@ -51,6 +52,7 @@ public class FileInput extends InputCompontent  {
                         pauseSleepLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                        return;
                     }
 
                     if (!working) {
@@ -70,6 +72,7 @@ public class FileInput extends InputCompontent  {
                     readDirectory(directory, directoryPath);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    return;
                 }
             }
             System.out.println("Stopped scan");
@@ -80,6 +83,7 @@ public class FileInput extends InputCompontent  {
                         pauseSleepLock.wait(sleepTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                        return;
                     }
                 }
             }
@@ -114,6 +118,10 @@ public class FileInput extends InputCompontent  {
                 }
             }
         }
+    }
+
+    public void interrupt() {
+        working = false;
     }
 
     public void stop() {
@@ -164,5 +172,9 @@ public class FileInput extends InputCompontent  {
 
     public WorkAssigner getWorkAssigner() {
         return workAssigner;
+    }
+
+    public Thread getWorkAssignerThread() {
+        return workAssignerThread;
     }
 }

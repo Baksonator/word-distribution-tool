@@ -65,4 +65,8 @@ public class OutputPane extends HBox {
         getChildren().add(resultChart);
         getChildren().add(vbox);
     }
+
+    public CacheOutput getCacheOutput() {
+        return cacheOutput;
+    }
 }
