@@ -1,10 +1,17 @@
 package output;
 
+import app.App;
+import gui.SingleCruncherPane;
+import gui.SingleFileInputPane;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,38 +43,84 @@ public class Unifier implements Callable<Map<String, Long>> {
 
     @Override
     public Map<String, Long> call() throws Exception {
-        Map<String, Long> finalResult = new HashMap<>();
-
-        List<Map<String, Long>> results = new ArrayList<>();
-
         try {
-            for (String resultName : resultsToSum) {
-                Map<String, Long> mapResult = cacheOutput.take(resultName);
-                results.add(mapResult);
+            Map<String, Long> finalResult = new HashMap<>();
 
-            }
-        } catch (InterruptedException e) {
-            return null;
-        }
+            List<Map<String, Long>> results = new ArrayList<>();
 
-        int jobSize = results.size();
+            try {
+                for (String resultName : resultsToSum) {
+                    Map<String, Long> mapResult = cacheOutput.take(resultName);
+                    results.add(mapResult);
 
-        for (Map<String, Long> result : results) {
-            for (Map.Entry<String, Long> entry : result.entrySet()) {
-                finalResult.merge(entry.getKey(), entry.getValue(), Long::sum);
+                }
+            } catch (InterruptedException e) {
+                return null;
             }
 
-            progress++;
-            Platform.runLater(() -> progressBar.setProgress((double) progress / (double) jobSize));
+            int jobSize = results.size();
+
+            for (Map<String, Long> result : results) {
+                for (Map.Entry<String, Long> entry : result.entrySet()) {
+                    finalResult.merge(entry.getKey(), entry.getValue(), Long::sum);
+                }
+
+                progress++;
+                Platform.runLater(() -> progressBar.setProgress((double) progress / (double) jobSize));
+            }
+
+
+            Platform.runLater(() -> {
+                vBox.getChildren().remove(progressBar);
+                vBox.getChildren().remove(barLabel);
+                resultsList.set(resultsList.indexOf(name + "*"), name);
+            });
+
+            return finalResult;
+        } catch (OutOfMemoryError e) {
+            stopApp();
         }
-
-
-        Platform.runLater(() -> {
-            vBox.getChildren().remove(progressBar);
-            vBox.getChildren().remove(barLabel);
-            resultsList.set(resultsList.indexOf(name + "*"), name);
-        });
-
-        return finalResult;
+        return null;
     }
+
+    private void stopApp() {
+        Platform.runLater(() -> {
+            Stage stage = new Stage();
+            stage.setTitle("Out of memory - Shutting down");
+
+            VBox vBox = new VBox();
+
+            Button okBtn = new Button("OK");
+            okBtn.setOnAction(event -> {
+                Platform.exit();
+                System.exit(0);
+            });
+            vBox.getChildren().add(okBtn);
+
+            stage.setOnCloseRequest(event -> {
+                Platform.exit();
+                System.exit(0);
+            });
+
+            App.inputThreadPool.shutdownNow();
+            App.outputThreadPool.shutdownNow();
+            App.cruncherThreadPool.shutdownNow();
+
+            for (SingleCruncherPane singleCruncherPane : App.cruncherPane1.getSingleCruncherPanes()) {
+                singleCruncherPane.getCounterCruncher().getMyThreadPool().shutdownNow();
+            }
+
+            for (SingleFileInputPane singleFileInputPane : App.fileInputsPane1.getFileInputPanes()) {
+                singleFileInputPane.getFileInputComponent().interrupt();
+                singleFileInputPane.getFileInputComponent().getWorkAssignerThread().interrupt();
+            }
+
+            App.outputPane1.getCacheOutput().getSortThreadPool().shutdownNow();
+
+            stage.setScene(new Scene(vBox, 300, 300));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        });
+    }
+
 }
