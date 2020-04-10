@@ -29,7 +29,7 @@ public class SumResultAction implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event) {
         Stage stage = new Stage();
-        stage.setTitle("Enter arity");
+        stage.setTitle("Enter name");
 
         VBox vBoxLocal = new VBox();
 

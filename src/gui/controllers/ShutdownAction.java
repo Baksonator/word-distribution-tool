@@ -36,9 +36,10 @@ public class ShutdownAction implements EventHandler<WindowEvent> {
 
             for (SingleFileInputPane singleFileInputPane : app.fileInputs.getFileInputPanes()) {
                 singleFileInputPane.getFileInputComponent().stop();
-                Object pauseSleepLock = singleFileInputPane.getFileInputComponent().getPauseSleepLock();
-                synchronized (pauseSleepLock) {
-                    pauseSleepLock.notify();
+//                Object pauseSleepLock = singleFileInputPane.getFileInputComponent().getPauseSleepLock();
+                synchronized (singleFileInputPane.getFileInputComponent().getPauseSleepLock()) {
+//                    pauseSleepLock.notify();
+                    singleFileInputPane.getFileInputComponent().getPauseSleepLock().notifyAll();
                 }
             }
 

@@ -70,9 +70,7 @@ public class CounterCruncher extends CruncherComponent {
                 }
 
             } catch (InterruptedException e) {
-                Platform.runLater(() -> {
-                    activeFiles.clear();
-                });
+                Platform.runLater(() -> activeFiles.clear());
                 e.printStackTrace();
                 return;
             }
